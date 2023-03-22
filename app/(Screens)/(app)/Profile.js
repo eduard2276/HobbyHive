@@ -1,8 +1,14 @@
 import React from 'react'
 import { Text } from 'react-native-paper'
+import { default as Menu } from '../../components/common/Footer'
 
-export function Profile(){
+const Profile = () => {
   return (
-    <Text>Profile</Text>
+    <>
+        <Text>Profile</Text>
+        <Menu/>
+    </>
   )
 }
+
+export default Profile

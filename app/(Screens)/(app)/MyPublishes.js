@@ -1,8 +1,14 @@
 import React from 'react'
 import { Text } from 'react-native-paper'
+import { default as Menu } from '../../components/common/Footer'
 
-export function MyPublishes(){
+const MyPublishes = () => {
   return (
-    <Text>MyPublishes</Text>
+    <>
+        <Text>MyPublishes</Text>
+        <Menu/>
+    </>
   )
 }
+
+export default MyPublishes

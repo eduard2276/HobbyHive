@@ -1,8 +1,14 @@
 import React from 'react'
 import { Text } from 'react-native-paper'
+import { default as Menu } from '../../components/common/Footer'
 
-export function Messages(){
+const Messages = () => {
   return (
-    <Text>MESSAGES</Text>
+    <>
+        <Text>Messages</Text>
+        <Menu/>
+    </>
   )
 }
+
+export default Messages

@@ -7,11 +7,10 @@ import Logo from '../../components/auth/Logo'
 import Header from '../../components/auth/Header'
 import Button from '../../components/auth/Button'
 import TextInput from '../../components/auth/TextInput'
-import BackButton from '../../components/auth/BackButton'
 import { theme } from '../../constants/theme'
 import { emailValidator } from '../../utils/emailValidator'
 import { passwordValidator } from '../../utils/passwordValidator'
-import { auth } from '../../hook/firebase'
+import { createUserAccount } from '../../utils/firebaseUtils'
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -26,13 +25,8 @@ export default function SignUp({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }
-    auth
-      .createUserWithEmailAndPassword(email.value, password.value)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log('Registered with:', user.email);
-      })
-      .catch(error => alert(error.message))
+    createUserAccount(email.value, password.value);
+    router.push('/Search');
   }
 
   return (
