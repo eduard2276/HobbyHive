@@ -1,20 +1,60 @@
 import { auth } from "../hook/firebase";
-import { getDatabase, ref, set } from "firebase/database";
+import { useState, useEffect } from "react";
+import { child, getDatabase, push, ref, set, update, get } from "firebase/database";
 
 
 const createUserAccount = (email, password) => {
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log('Registered with:', user);
-        const database = getDatabase();
-        const userId = 1;
-        set(ref(database, `users/${3}`), {
-          email: email
-        });
-      })
-      .catch(error => alert(error.message))
+  auth
+    .createUserWithEmailAndPassword(email, password)
+    .then(userCredentials => {
+      const user = userCredentials.user;
+      console.log('Registered with:', user);
+      const database = getDatabase();
+      set(ref(database, `users/${auth.currentUser?.uid}`), {
+        userInfo: {
+          email: email,
+          isProfileReady: false
+        }
+      });
+    })
+    .catch(error => alert(error.message))
 }
 
-export {createUserAccount}
+const updateUserInformation = async (userInfo) => {
+  const database = getDatabase();
+  const postData = {
+    email: auth.currentUser?.email,
+    ...userInfo
+  }
+  const updates = {};
+  updates[`/users/${auth.currentUser?.uid}/userInfo`] = postData
+  return update(ref(database), updates)
+}
+
+const getUserInfo = () => {
+  const [data, setData] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const fetchData = async () => {
+    setIsLoading(true)
+
+    const databaseRef = ref(getDatabase());
+    get(child(databaseRef, `users/${auth.currentUser?.uid}/userInfo`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData(snapshot.val())
+          setIsLoading(false)
+          console.log(snapshot.val())
+        } else {
+          setError("No data available")
+        }
+      }).finally(() => { setIsLoading(false) })
+  }
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return{ data, isLoading, error }
+}
+export { createUserAccount, updateUserInformation, getUserInfo }

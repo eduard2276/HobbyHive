@@ -1,43 +1,70 @@
-import React, {useState} from 'react'
-import { Text, View, StyleSheet, ScrollView, SafeAreaView } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import {StyleSheet, ScrollView, SafeAreaView, ActivityIndicator, Text } from 'react-native'
+import setting from '../../assets/photos/setting.png'
 import { default as Menu } from '../../components/common/Footer'
+import ScreenHeaderButton from '../../components/common/ScreenHeaderButton'
 import ProfileHeader from '../../components/profile/ProfileHeader'
 import ProfileTabs from '../../components/profile/ProfileTabs'
 import AboutSectionTab from '../../components/profile/tabs/AboutSectionTab'
 import ReviewsSectionTab from '../../components/profile/tabs/ReviewsSectionTab'
+import { getUserInfo } from '../../utils/firebaseUtils'
+import { useRouter, Stack } from 'expo-router'
 
-const tabs = [ "About", "Reviews"]
+
+
+const tabs = ["About", "Reviews"]
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState(tabs[0])
+  const { data, isLoading, error } = getUserInfo()
+  const router = useRouter()
 
-  const displayTabContent = () =>{
+  const displayTabContent = () => {
     switch (activeTab) {
-        case "About":
-            return <AboutSectionTab/>
-        case "Reviews":
-            return <ReviewsSectionTab/>
-        default:
-            break;
+      case "About":
+        return <AboutSectionTab data={data} />
+      case "Reviews":
+        return <ReviewsSectionTab />
+      default:
+        break;
     }
   }
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <ProfileHeader 
-          name={'Eduard Coras'}
-          image={"https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7"}
-          stars={5}
-        />
-        <ProfileTabs 
-          tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-        {displayTabContent()}
-      </ScrollView>
-      <Menu/>
-      
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: "#FFF" },
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerRight: () => (
+
+            <ScreenHeaderButton
+              iconUrl={setting}
+              dimension="60%"
+              handlePress={() => router.push('/EditProfile')}
+            />
+          ),
+          headerTitle: "Profile"
+        }}
+      />
+      {isLoading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <ScrollView>
+          <ProfileHeader
+            data={data}
+          />
+          <ProfileTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
+          {displayTabContent()}
+        </ScrollView>
+      )}
+
+      < Menu />
+
     </SafeAreaView>
   )
 }

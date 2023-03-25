@@ -26,7 +26,7 @@ export default function SignUp({ navigation }) {
       return
     }
     createUserAccount(email.value, password.value);
-    router.push('/Search');
+    router.push('/EditProfile');
   }
 
   return (

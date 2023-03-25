@@ -6,7 +6,6 @@ const Publish = () => {
   return (
     <>
         <Text>Publish</Text>
-        <Menu/>
     </>
   )
 }

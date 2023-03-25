@@ -2,7 +2,6 @@ import { View, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native'
 import { Stack } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { Image } from 'react-native'
-import { heart } from '../../assets/photos/heart.png'
 
 const Footer = () => {
   const router = useRouter();
@@ -10,35 +9,30 @@ const Footer = () => {
     <View style={styles.container}>
       <TouchableOpacity onPress={()=>{router.push('/Search')}} style={styles.likeBtn}>
         <Image
-          source={heart}
           resizeMode='contain'
           style={styles.likeBtnImage}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={()=>{router.push('/Publish')}} style={styles.likeBtn}>
         <Image
-          source={''}
           resizeMode='contain'
           style={styles.likeBtnImage}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={()=>{router.push('/MyPublishes')}} style={styles.likeBtn}>
         <Image
-          source={heart}
           resizeMode='contain'
           style={styles.likeBtnImage}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={()=>{router.push('/Messages')}} style={styles.likeBtn}>
         <Image
-          source={heart}
           resizeMode='contain'
           style={styles.likeBtnImage}
         />
       </TouchableOpacity>
       <TouchableOpacity onPress={()=>{router.push('/Profile')}} style={styles.likeBtn}>
         <Image
-          source={heart}
           resizeMode='contain'
           style={styles.likeBtnImage}
         />
