@@ -20,6 +20,20 @@ const createUserAccount = (email, password) => {
     .catch(error => alert(error.message))
 }
 
+const createNewPost = (data) => {
+  const database = getDatabase();
+  const postData = {
+    uid: auth.currentUser?.uid,
+    ...data
+  }
+  const newPostKey = push(child(ref(database), 'posts')).key;
+
+  const updates = {}
+  updates[`/users/${auth.currentUser?.uid}/posts/${newPostKey}`] = postData
+  updates[`/posts/${newPostKey}`] = postData
+  return update(ref(database), updates);
+}
+
 const updateUserInformation = async (userInfo) => {
   const database = getDatabase();
   const postData = {
@@ -57,4 +71,5 @@ const getUserInfo = () => {
 
   return{ data, isLoading, error }
 }
-export { createUserAccount, updateUserInformation, getUserInfo }
+
+export { createUserAccount, updateUserInformation, getUserInfo, createNewPost}
