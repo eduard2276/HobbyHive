@@ -7,7 +7,6 @@ const TimePicker = ({text, setHour}) => {
 
 
     const showTimePicker = () => {
-        console.log(isTimePickerVisible)
         setTimePickerVisibility(true);
     };
 
@@ -16,9 +15,9 @@ const TimePicker = ({text, setHour}) => {
     };
 
     const handleConfirm = (time) => {
-        console.warn("A time has been picked: ", time);
-        setHour(time)
+        console.log("A time has been picked: ", time);
         hideTimePicker();
+        setHour(time)
     };
     return (
         <View>

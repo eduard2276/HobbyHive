@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Text, SafeAreaView, StyleSheet, View, ScrollView } from "react-native";
-import { sports } from "../../constants/";
+import { sports } from "../../../constants";
 import { SelectList } from "react-native-dropdown-select-list";
 import Icon from "react-native-vector-icons/EvilIcons";
-import Selector from "../../components/publish/Selector";
-import DatePicker from "../../components/publish/DatePicker";
-import TimePicker from "../../components/publish/TimePicker";
-import Button from "../../components/auth/Button";
-import TextInput from "../../components/auth/TextInput";
-import { createNewPost } from "../../utils/firebaseUtils";
-import { useRouter } from "expo-router";
+import Selector from "../../../components/publish/Selector";
+import DatePicker from "../../../components/publish/DatePicker";
+import TimePicker from "../../../components/publish/TimePicker";
+import Button from "../../../components/auth/Button";
+import TextInput from "../../../components/auth/TextInput";
+import { updatePost, getUserPost } from "../../../utils/firebaseUtils";
+import { useRouter, useSearchParams } from "expo-router";
 
 const numOfPleopleSelection = [
   "1",
@@ -31,7 +31,10 @@ const otherUsersLevelSelection = [
   "Experienced",
 ];
 
-const Publish = () => {
+const EditPost = () => {
+  const params = useSearchParams();
+
+  const { data, isLoading, error, refetch } = getUserPost(params.id);
   const [selected, setSelected] = useState("");
   const [numOfPeople, setNumOfPeople] = useState(numOfPleopleSelection[0]);
   const [userLevel, setUserLevel] = useState(userLevelSelection[0]);
@@ -46,8 +49,31 @@ const Publish = () => {
   const [formattedDate, setFormattedDate] = useState("");
   const router = useRouter();
 
+  const convertStringtoTime = (time) => {
+    if (time) {
+      const date = new Date();
+      const timesplit = time.split(":");
+      date.setHours(parseInt(timesplit[0]), parseInt(timesplit[1]));
+      return date;
+    }
+    return "";
+  };
+
+  useEffect(() => {
+    if (data.sport) {
+      setSelected(1);
+      setNumOfPeople(data.numOfPeople);
+      setUserLevel(data.userLevel);
+      setOtherUserLevel(data.otherUsersLevel);
+      setStartDate(new Date(data.date));
+      setStartTime(convertStringtoTime(data.startTime));
+      setEndTime(convertStringtoTime(data.endTime));
+      setAdditionalInfo(data.additionalInfo);
+    }
+  }, [data]);
+
   const handlePost = () => {
-    createNewPost({
+    updatePost(params.id, {
       sport: selected,
       numOfPeople: numOfPeople,
       userLevel: userLevel,
@@ -154,7 +180,7 @@ const Publish = () => {
   );
 };
 
-export default Publish;
+export default EditPost;
 
 const styles = StyleSheet.create({
   container: {
