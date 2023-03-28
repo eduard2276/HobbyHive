@@ -1,40 +1,39 @@
 import { Stack, useRouter } from "expo-router";
-import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
-import { Text } from 'react-native-paper'
-import Background from '../../components/auth/Background'
-import Logo from '../../components/auth/Logo'
-import Header from '../../components/auth/Header'
-import Button from '../../components/auth/Button'
-import TextInput from '../../components/auth/TextInput'
-import { theme } from '../../constants/theme'
-import { emailValidator } from '../../utils/emailValidator'
-import { passwordValidator } from '../../utils/passwordValidator'
-import { auth } from '../../hook/firebase'
+import React, { useState } from "react";
+import { TouchableOpacity, StyleSheet, View } from "react-native";
+import { Text } from "react-native-paper";
+import Background from "../../components/auth/Background";
+import Logo from "../../components/auth/Logo";
+import Header from "../../components/auth/Header";
+import Button from "../../components/auth/Button";
+import TextInput from "../../components/auth/TextInput";
+import { theme } from "../../constants/theme";
+import { emailValidator } from "../../utils/emailValidator";
+import { passwordValidator } from "../../utils/passwordValidator";
+import { auth } from "../../hook/firebase";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
+  const [email, setEmail] = useState({ value: "", error: "" });
+  const [password, setPassword] = useState({ value: "", error: "" });
   const router = useRouter();
 
-
   const onLoginPressed = () => {
-    const emailError = emailValidator(email.value)
-    const passwordError = passwordValidator(password.value)
+    const emailError = emailValidator(email.value);
+    const passwordError = passwordValidator(password.value);
     if (emailError || passwordError) {
-      setEmail({ ...email, error: emailError })
-      setPassword({ ...password, error: passwordError })
-      return
+      setEmail({ ...email, error: emailError });
+      setPassword({ ...password, error: passwordError });
+      return;
     }
     auth
       .signInWithEmailAndPassword(email.value, password.value)
-      .then(userCredentials => {
+      .then((userCredentials) => {
         const user = userCredentials.user;
-        console.log('Logged in with:', user.email);
-        router.push('/Search');
+        console.log("Logged in with:", user.email);
+        router.push("/Search");
       })
-      .catch(error => alert(error.message))
-  }
+      .catch((error) => alert(error.message));
+  };
 
   return (
     <Background>
@@ -44,7 +43,7 @@ export default function LoginScreen({ navigation }) {
         label="Email"
         returnKeyType="next"
         value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: '' })}
+        onChangeText={(text) => setEmail({ value: text, error: "" })}
         error={!!email.error}
         errorText={email.error}
         autoCapitalize="none"
@@ -56,7 +55,7 @@ export default function LoginScreen({ navigation }) {
         label="Password"
         returnKeyType="done"
         value={password.value}
-        onChangeText={(text) => setPassword({ value: text, error: '' })}
+        onChangeText={(text) => setPassword({ value: text, error: "" })}
         error={!!password.error}
         errorText={password.error}
         secureTextEntry
@@ -66,22 +65,26 @@ export default function LoginScreen({ navigation }) {
       </Button>
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => {router.push("/SignUp")}}>
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/SignUp");
+          }}
+        >
           <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </Background>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   forgotPassword: {
-    width: '100%',
-    alignItems: 'flex-end',
+    width: "100%",
+    alignItems: "flex-end",
     marginBottom: 24,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 4,
   },
   forgot: {
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
     color: theme.colors.secondary,
   },
   link: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: theme.colors.primary,
   },
-})
+});

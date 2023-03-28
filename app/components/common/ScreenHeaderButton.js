@@ -1,7 +1,7 @@
-import React from 'react'
-import { TouchableOpacity, Image, StyleSheet } from 'react-native'
+import React from "react";
+import { TouchableOpacity, Image, StyleSheet } from "react-native";
 
-const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress}) => {
+const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress }) => {
   return (
     <TouchableOpacity style={styles.btnContainer} onPress={handlePress}>
       <Image
@@ -10,10 +10,10 @@ const ScreenHeaderBtn = ({ iconUrl, dimension, handlePress}) => {
         style={styles.btnImg(dimension)}
       />
     </TouchableOpacity>
-  )
-}
+  );
+};
 
-export default ScreenHeaderBtn
+export default ScreenHeaderBtn;
 
 const styles = StyleSheet.create({
   btnContainer: {

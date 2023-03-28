@@ -40,20 +40,20 @@ const Publish = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
-  const [additionalInfo, setAdditionalInfo] = useState("")
+  const [additionalInfo, setAdditionalInfo] = useState("");
 
   const handlePost = () => {
     createNewPost({
-      "sport": selected,
-      "numPfPeople": numOfPeople,
-      'userLevel': userLevel,
-      'otherUsersLevel': otherUsersLevel,
-      'date': startDate.getDay(),
-      'startTime': startTime.getHours(),
-      'endTime': endTime.getHours(),
-      'additionalInfo': additionalInfo
-    })
-  }
+      sport: selected,
+      numPfPeople: numOfPeople,
+      userLevel: userLevel,
+      otherUsersLevel: otherUsersLevel,
+      date: startDate.getDay(),
+      startTime: startTime.getHours(),
+      endTime: endTime.getHours(),
+      additionalInfo: additionalInfo,
+    });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -123,12 +123,15 @@ const Publish = () => {
             style={{ marginTop: 10 }}
           />
         </View>
-        <View style={{alignSelf: "center", width: "60%"}}>
-          <Button mode="contained" style={{ marginTop: 24 }} onPress={handlePost}>
+        <View style={{ alignSelf: "center", width: "60%" }}>
+          <Button
+            mode="contained"
+            style={{ marginTop: 24 }}
+            onPress={handlePost}
+          >
             Save
           </Button>
         </View>
-        
       </ScrollView>
     </SafeAreaView>
   );
