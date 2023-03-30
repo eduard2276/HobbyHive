@@ -177,6 +177,46 @@ const getUserPost = (key) => {
   return { data, isLoading, error, refetch };
 };
 
+
+const getAllPosts = () => {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+
+    const databaseRef = ref(getDatabase());
+    get(child(databaseRef, "/posts"))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const result = Object.keys(snapshot.val()).map((key) => ({
+            [key]: snapshot.val()[key],
+          }));
+          console.log("Aici");
+          setData(result);
+          setIsLoading(false);
+        } else {
+          setData([]);
+          setError("No data available");
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { data, isLoading, error, refetch };
+};
+
+
 export {
   createUserAccount,
   updateUserInformation,
@@ -186,4 +226,5 @@ export {
   deleteUserPost,
   getUserPost,
   updatePost,
+  getAllPosts,
 };

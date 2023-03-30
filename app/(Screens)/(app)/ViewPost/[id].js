@@ -31,7 +31,10 @@ const otherUsersLevelSelection = [
   "Experienced",
 ];
 
-const EditPost = () => {
+
+//TO DO: MAKE user view post
+
+const Search = () => {
   const params = useSearchParams();
 
   const { data, isLoading, error, refetch } = getUserPost(params.id);
@@ -192,7 +195,7 @@ const EditPost = () => {
   );
 };
 
-export default EditPost;
+export default Search;
 
 const styles = StyleSheet.create({
   container: {

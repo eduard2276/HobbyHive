@@ -38,6 +38,7 @@ const Publish = () => {
   const [otherUsersLevel, setOtherUserLevel] = useState(
     otherUsersLevelSelection[0]
   );
+  const [location, setLocation] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -52,6 +53,7 @@ const Publish = () => {
       numOfPeople: numOfPeople,
       userLevel: userLevel,
       otherUsersLevel: otherUsersLevel,
+      location: location,
       date: startDate.getTime(),
       startTime: `${startTime.getHours()}:${startTime.getMinutes()}`,
       endTime: `${endTime.getHours()}:${endTime.getMinutes()}`,
@@ -94,7 +96,16 @@ const Publish = () => {
           activeTab={otherUsersLevel}
           setActiveTab={setOtherUserLevel}
         />
-
+        <View style={styles.categoryContainer}>
+          <Text style={styles.titleLabel}>Specify location</Text>
+          <TextInput
+            label=""
+            returnKeyType="next"
+            value={location}
+            onChangeText={(text) => setLocation(text)}
+            style={{ marginTop: 10 }}
+          />
+        </View>
         <View style={styles.categoryContainer}>
           <Text style={styles.titleLabel}>When do you want to go?</Text>
           <DatePicker
