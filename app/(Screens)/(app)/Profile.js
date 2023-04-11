@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Text,
 } from "react-native";
+import { auth } from "../../hook/firebase";
 import setting from "../../assets/photos/setting.png";
 import { default as Menu } from "../../components/common/Footer";
 import ScreenHeaderButton from "../../components/common/ScreenHeaderButton";
@@ -20,7 +21,7 @@ const tabs = ["About", "Reviews"];
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState(tabs[0]);
-  const { data, isLoading, error } = getUserInfo();
+  const { data, isLoading, error } = getUserInfo(auth.currentUser?.uid);
   const router = useRouter();
 
   const displayTabContent = () => {

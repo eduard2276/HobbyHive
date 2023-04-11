@@ -13,10 +13,11 @@ import { getAllPosts } from "../../utils/firebaseUtils";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import Searchcomponent from "../../components/search/Searchcomponent";
+import { auth } from "../../hook/firebase";
 
 
 const Search = () => {
-  const { data, isLoading, error, refetch } = getAllPosts(); 
+  const { data, isLoading, error, refetch } = getAllPosts();
   const [searchTerm, setSearchTerm] = useState("")
   const router = useRouter();
 
@@ -30,10 +31,17 @@ const Search = () => {
     return formattedDate;
   };
 
-
+  const getAvailableSpots = (data) => {
+    if (data?.appliedUsers)
+    {
+      console.log(data.appliedUsers.length);
+      return parseInt(data?.numOfPeople) - data.appliedUsers.length;
+    }
+    return data?.numOfPeople
+  }
   return (
     <View style={styles.container}>
-      <Searchcomponent 
+      <Searchcomponent
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handleClick = {() => {}}
@@ -46,27 +54,33 @@ const Search = () => {
           renderItem={({ item }) => {
             const key = getKey(item);
             const data = item[key];
-            return (
-              <TouchableOpacity style={styles.card} onPress={() => {router.push({ pathname: `/ViewPost/${getKey(item)}` });}}>
-                <View style={styles.item}>
-                  <Image
-                    style={styles.itemImage}
-                    source={{
-                      uri: "https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7",
-                    }}
-                  />
-                  <View style={styles.itemContent}>
-                    <Text style={styles.itemName}>
-                      {data.sport} - {data.numOfPeople} people needed
-                    </Text>
-                    <Text style={styles.itemPrice}>
-                      Time: {getDateFormatted(data.date)}, {data.startTime} -{" "}
-                      {data.endTime}
-                    </Text>
+            if (data?.uid != auth.currentUser?.uid)
+            {
+              return (
+                <TouchableOpacity style={styles.card} onPress={() => {router.push({ pathname: `/ViewPost/${getKey(item)}\\${data.uid}` });}}>
+                  <View style={styles.item}>
+                    <Image
+                      style={styles.itemImage}
+                      source={{
+                        uri: "https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7",
+                      }}
+                    />
+                    <View style={styles.itemContent}>
+                      <Text style={styles.itemName}>
+                        {data.sport} - {data.numOfPeople} people needed
+                      </Text>
+                      <Text style={styles.spotsLeft}>
+                        {getAvailableSpots(data)} spots available
+                      </Text>
+                      <Text style={styles.itemPrice}>
+                        Time: {getDateFormatted(data.date)}, {data.startTime} -{" "}
+                        {data.endTime}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
+                </TouchableOpacity>
+              );
+            }
           }}
           keyExtractor={(item) => getKey(item)}
         />
@@ -94,7 +108,7 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 20,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -120,6 +134,11 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  spotsLeft: {
+    paddingTop: 5,
+    fontSize: 16,
+    color: "#ff0000",
   },
   itemPrice: {
     paddingTop: 5,

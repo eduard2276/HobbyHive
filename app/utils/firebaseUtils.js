@@ -15,7 +15,6 @@ const createUserAccount = (email, password) => {
     .createUserWithEmailAndPassword(email, password)
     .then((userCredentials) => {
       const user = userCredentials.user;
-      console.log("Registered with:", user);
       const database = getDatabase();
       set(ref(database, `users/${auth.currentUser?.uid}`), {
         userInfo: {
@@ -65,7 +64,7 @@ const updateUserInformation = async (userInfo) => {
   return update(ref(database), updates);
 };
 
-const getUserInfo = () => {
+const getUserInfo = (userUid) => {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -74,12 +73,11 @@ const getUserInfo = () => {
     setIsLoading(true);
 
     const databaseRef = ref(getDatabase());
-    get(child(databaseRef, `users/${auth.currentUser?.uid}/userInfo`))
+    get(child(databaseRef, `users/${userUid}/userInfo`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(snapshot.val());
           setIsLoading(false);
-          console.log(snapshot.val());
         } else {
           setError("No data available");
         }
@@ -92,7 +90,11 @@ const getUserInfo = () => {
     fetchData();
   }, []);
 
-  return { data, isLoading, error };
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { data, isLoading, error, refetch };
 };
 
 const getUserPosts = () => {
@@ -110,7 +112,6 @@ const getUserPosts = () => {
           const result = Object.keys(snapshot.val()).map((key) => ({
             [key]: snapshot.val()[key],
           }));
-          console.log("Aici");
           setData(result);
           setIsLoading(false);
         } else {
@@ -150,12 +151,10 @@ const getUserPost = (key) => {
     setIsLoading(true);
 
     const databaseRef = ref(getDatabase());
-    get(child(databaseRef, `users/${auth.currentUser?.uid}/posts/${key}`))
+    get(child(databaseRef, `/posts/${key}`))
       .then((snapshot) => {
         if (snapshot.exists()) {
           setData(snapshot.val());
-          console.log("hey");
-          console.log(snapshot.val());
           setIsLoading(false);
         } else {
           setData([]);
@@ -177,6 +176,46 @@ const getUserPost = (key) => {
   return { data, isLoading, error, refetch };
 };
 
+const getUserPostAndDetails = (key) => {
+  const [data, setData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const postId = key.split('\\')[0]
+  const userId = key.split('\\')[1]
+
+  const fetchData = async () => {
+    setIsLoading(true);
+
+    const databaseRef = ref(getDatabase());
+    get(child(databaseRef, `users/${userId}`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          setData({
+            'userDetails': snapshot.val()['userInfo'],
+            'postDetails': snapshot.val()['posts'][postId]
+          });
+          console.log(snapshot.val()['userInfo'])
+          console.log(snapshot.val()['posts'][postId])
+        } else {
+          setData([]);
+          setError("No data available");
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { data, isLoading, error, refetch };
+};
 
 const getAllPosts = () => {
   const [data, setData] = useState([]);
@@ -193,7 +232,6 @@ const getAllPosts = () => {
           const result = Object.keys(snapshot.val()).map((key) => ({
             [key]: snapshot.val()[key],
           }));
-          console.log("Aici");
           setData(result);
           setIsLoading(false);
         } else {
@@ -216,6 +254,36 @@ const getAllPosts = () => {
   return { data, isLoading, error, refetch };
 };
 
+const applyUser = (data, key) => {
+  const database = getDatabase();
+  const appliedUser = data.postDetails.uid;
+  const postDetails = data.postDetails;
+
+  console.log(data.postDetails.appliedUsers)
+
+  //TO DO: Check to verify daca mai useru mai e
+  let postData = {};
+  if (postDetails?.appliedUsers)
+  {
+    postDetails.appliedUsers.push(auth.currentUser?.uid)
+    postData = {
+      appliedUsers: postDetails,
+      ...postDetails,
+    };
+  }
+  else{
+    postData = {
+      appliedUsers: [auth.currentUser?.uid],
+      ...postDetails,
+    };
+  }
+
+
+  const updates = {};
+  updates[`/users/${appliedUser}/posts/${key}`] = postData;
+  updates[`/posts/${key}`] = postData;
+  return update(ref(database), updates);
+};
 
 export {
   createUserAccount,
@@ -227,4 +295,6 @@ export {
   getUserPost,
   updatePost,
   getAllPosts,
+  getUserPostAndDetails,
+  applyUser
 };

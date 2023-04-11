@@ -12,24 +12,24 @@ const ProfileHeader = ({ data }) => {
         }}
       />
       <View style={styles.informationContainer}>
-        <Text style={styles.name}>{data.fullName}</Text>
+        <Text style={styles.name}>{data?.fullName}</Text>
         <View style={styles.userInfoSection}>
           <View style={styles.basicInfo}>
             <Icon name="phone" color="#777777" size={20} />
             <Text style={{ color: "#777777", marginLeft: 1 }}>
-              {data.phoneNumber}
+              {data?.phoneNumber}
             </Text>
           </View>
           <View style={styles.basicInfo}>
             <Icon name="email" color="#777777" size={20} />
             <Text style={{ color: "#777777", marginLeft: 1 }}>
-              {data.email}
+              {data?.email}
             </Text>
           </View>
           <View style={styles.basicInfo}>
             <Icon name="star" color="#8B8000" size={20} />
             <Text style={{ color: "#777777", marginLeft: 1 }}>
-              - {data.stars ? data.stars : ""}
+              - {data?.stars ? data?.stars : ""}
             </Text>
           </View>
         </View>
@@ -74,19 +74,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 22,
-    fontWeight: "bold",
-    color: "#000000",
-  },
-  starsContainer: {
-    flexDirection: "row",
-    paddingTop: 25,
-  },
-  starImage: {
-    width: 28,
-    height: 28,
-  },
-  label: {
-    fontSize: 20,
     fontWeight: "bold",
     color: "#000000",
   },
