@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
   searchBtnImage: {
     width: "50%",
     height: "50%",
-    tintColor: "#F3F4F8",
+    //tintColor: "#F3F4F8",
   },
 });

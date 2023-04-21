@@ -1,89 +1,33 @@
-import React from "react";
+import {useState} from "react";
 import {
   View,
-  Text,
-  Image,
   StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
 } from "react-native";
+import { default as Tabs } from "../../components/profile/ProfileTabs";
 import { default as Menu } from "../../components/common/Footer";
-import { getUserPosts, deleteUserPost } from "../../utils/firebaseUtils";
-import { format } from "date-fns";
-import { useRouter } from "expo-router";
+import UserPosts from "../../components/feed/UserPosts";
+import AppliedPosts from "../../components/feed/AppliedPosts";
 
+const tabs = ["My Posts", "Applied Posts"];
 const MyPublishes = () => {
-  const { data, isLoading, error, refetch } = getUserPosts();
+  const [activeTab, setActiveTab] = useState(tabs[0]);
 
-  const router = useRouter();
-
-  const getKey = (item) => {
-    return Object.keys(item)[0];
-  };
-
-  const getDateFormatted = (date) => {
-    const userDate = new Date(date);
-    var formattedDate = format(userDate, "dd/MM");
-    return formattedDate;
-  };
-
-  const handleDelete = (key) => {
-    console.log("Hello ", key);
-    deleteUserPost(key).then(() => {
-      refetch();
-    });
-  };
-
-  const handleUpdate = (key, data) => {
-    console.log(data);
-    router.push({ pathname: `/EditPost/${key}` });
+  const displayTabContent = () => {
+    switch (activeTab) {
+      case "My Posts":
+        return <UserPosts/>;
+      case "Applied Posts":
+        return <AppliedPosts/>;
+      default:
+        break;
+    }
   };
 
   return (
     <View style={styles.container}>
-      {isLoading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={({ item }) => {
-            const key = getKey(item);
-            const data = item[key];
-            return (
-              <View style={styles.card}>
-                <View style={styles.item}>
-                  <Image style={styles.itemImage} />
-                  <View style={styles.itemContent}>
-                    <Text style={styles.itemName}>
-                      {data.sport} - {data.numOfPeople} people needed
-                    </Text>
-                    <Text style={styles.itemPrice}>
-                      Time: {getDateFormatted(data.date)}, {data.startTime} -{" "}
-                      {data.endTime}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.buttons}>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => handleUpdate(key, data)}
-                  >
-                    <Text style={styles.buttonText}>Edit post</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => handleDelete(key)}
-                  >
-                    <Text style={styles.buttonText}>Delete post</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            );
-          }}
-          keyExtractor={(item) => getKey(item)}
-        />
-      )}
+      <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+      {displayTabContent()}
+
       <Menu />
     </View>
   );
