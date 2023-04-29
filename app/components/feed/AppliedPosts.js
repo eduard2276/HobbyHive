@@ -9,12 +9,12 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { default as Tabs }  from "../profile/ProfileTabs";
-import { getUserPosts, deleteUserPost, getUserAppliedPosts } from "../../utils/firebaseUtils";
+import { cancelPost, deleteUserPost, getUserAppliedPosts } from "../../utils/firebaseUtils";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 
 const AppliedPosts = () => {
-  const { data, isLoading } = getUserAppliedPosts();
+  const { data, isLoading, refetch } = getUserAppliedPosts();
 
   const router = useRouter();
 
@@ -28,17 +28,12 @@ const AppliedPosts = () => {
     return formattedDate;
   };
 
-  const handleDelete = (key) => {
-    console.log("Hello ", key);
-    deleteUserPost(key).then(() => {
-      refetch();
-    });
+  const handleCancel = (postId) => {
+    console.log("Cancel Pressed")
+    cancelPost(postId)
+
   };
 
-  const handleUpdate = (key, data) => {
-    console.log(data);
-    router.push({ pathname: `/EditPost/${key}` });
-  };
 
   return (
     <View style={styles.container}>
@@ -72,7 +67,7 @@ const AppliedPosts = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={() => handleDelete(key)}
+                    onPress={() => handleCancel(data.postId)}
                   >
                     <Text style={styles.buttonText}>Cancel</Text>
                   </TouchableOpacity>

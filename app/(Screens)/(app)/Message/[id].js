@@ -39,7 +39,7 @@ const Messages = () => {
     const unsubscribe = onValue(dbRef, (snapshot) => {
       let messages = []
       for (const property in snapshot.val()) {
-        console.log(snapshot.val()[property]._id);
+
         messages.push({
             _id: snapshot.val()[property]._id,
             text: snapshot.val()[property].message,
@@ -50,7 +50,6 @@ const Messages = () => {
         })
       }
       messages.sort((a, b) => {
-        console.log(a)
         return b.createdAt - a.createdAt;
       });
       setMessages(messages)
@@ -63,16 +62,7 @@ const Messages = () => {
 
   const onSend = useCallback((messages = []) => {
     setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
-    console.log(data.fullName)
     const { _id, createdAt, text, user } = messages[0];
-    console.log("------ID------")
-    console.log(_id)
-    console.log("------CREATED------")
-    console.log(createdAt)
-    console.log("------TEXT------")
-    console.log(text)
-    console.log("-----USER-------")
-    console.log(user)
     sendMessage({
         _id: _id,
         fullName: "data.fullName",

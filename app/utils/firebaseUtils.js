@@ -8,6 +8,8 @@ import {
   set,
   update,
   get,
+  onValue,
+  remove
 } from "firebase/database";
 
 const createUserAccount = (email, password) => {
@@ -158,7 +160,10 @@ const getUserAppliedPosts = () => {
       const postId = Object.keys(result[key])[0];
       const postSnapshot = await get(child(databaseRef, `/posts/${postId}`));
       if (postSnapshot.val()) {
-        postsArray.push(postSnapshot.val());
+        postsArray.push({
+          ...postSnapshot.val(),
+          postId: postId
+        });
       }
     }
     console.log(postsArray);
@@ -170,7 +175,11 @@ const getUserAppliedPosts = () => {
     fetchData();
   }, []);
 
-  return { data, isLoading };
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { data, isLoading, refetch };
 };
 
 const deleteUserPost = async (key) => {
@@ -326,60 +335,216 @@ const applyUser = (data, key) => {
   return update(ref(database), updates);
 };
 
-const getChatId = (userId1, userId2) =>
-{
+const getChatId = (userId1, userId2) => {
   let chatId = "";
   if (userId1 > userId2) {
     chatId = userId1 + "_" + userId2;
   } else {
     chatId = userId2 + "_" + userId1;
   }
-  return chatId
-}
+  return chatId;
+};
 
 const createChat = (userId1, userId2) => {
+  if (checkChatExists(userId1, userId2)) {
+    return;
+  }
   let chatId = getChatId(userId1, userId2);
   const database = getDatabase();
-  console.log(createChat)
+  console.log(createChat);
   set(ref(database, `/chats/${chatId}`), {
-    participants: [userId1, userId2]
+    participants: [userId1, userId2],
   });
 };
 
 const checkChatExists = async (userId1, userId2) => {
   let chatId = getChatId(userId1, userId2);
-  console.log("SUNT AICI")
+  console.log("SUNT AICI");
   const databaseRef = ref(getDatabase());
   const snapshot = await get(child(databaseRef, `chats/${chatId}`));
   if (snapshot.val()) {
-    console.log("true")
+    console.log("true");
     return true;
   } else {
-    console.log("false")
+    console.log("false");
     return false;
   }
 };
 
-const sendMessage = ({_id, fullName, timestamp, message, to}) => {
+const sendMessage = ({ _id, fullName, timestamp, message, to }) => {
   let chatId = getChatId(auth.currentUser?.uid, to);
   const database = getDatabase();
 
   set(ref(database, `/messages/${chatId}/${timestamp}`), {
-    "uid": auth.currentUser?.uid,
-    "_id": _id,
-    "timestamp": timestamp,
-    "message": message,
-    "fullName": fullName
+    uid: auth.currentUser?.uid,
+    _id: _id,
+    timestamp: timestamp,
+    message: message,
+    fullName: fullName,
   });
 
   let postData = {
     participants: [auth.currentUser?.uid, to],
     lastMessage: message,
-    timestamp: timestamp
+    timestamp: timestamp,
   };
   const updates = {};
   updates[`chats/${chatId}`] = postData;
-  update(ref(database), updates)
+  update(ref(database), updates);
+};
+
+const getUserChats = () => {
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const refetch = async () => {
+    const databaseRef = ref(getDatabase());
+    const snapshot = await get(child(databaseRef, `chats`));
+    if (!snapshot.val()) {
+      setIsLoading(false);
+      return;
+    }
+    let otherUsersIds = [];
+    let chats = [];
+    for (const property in snapshot.val()) {
+      const participants = snapshot.val()[property].participants;
+
+      let participantId = "";
+      if (participants[0] === auth.currentUser?.uid) {
+        participantId = participants[1];
+        otherUsersIds.push(participants[1]);
+      } else if (participants[1] === auth.currentUser?.uid) {
+        participantId = participants[0];
+        otherUsersIds.push(participants[0]);
+      }
+
+      if (participantId !== "") {
+        const nameSnapshot = await get(
+          child(databaseRef, `users/${participantId}`)
+        );
+        chats.push({
+          userName: nameSnapshot.val().userInfo.fullName,
+          userId: participantId,
+          lastMessage: snapshot.val()[property].lastMessage,
+          timestamp: snapshot.val()[property].timestamp,
+        });
+      }
+    }
+    setData(chats);
+    setIsLoading(false);
+  }
+
+  const fetchData = async () => {
+    setIsLoading(true);
+
+    const databaseRef = ref(getDatabase());
+    const snapshot = await get(child(databaseRef, `chats`));
+    if (!snapshot.val()) {
+      setIsLoading(false);
+      return;
+    }
+    let otherUsersIds = [];
+    let chats = [];
+    for (const property in snapshot.val()) {
+      const participants = snapshot.val()[property].participants;
+
+      let participantId = "";
+      if (participants[0] === auth.currentUser?.uid) {
+        participantId = participants[1];
+        otherUsersIds.push(participants[1]);
+      } else if (participants[1] === auth.currentUser?.uid) {
+        participantId = participants[0];
+        otherUsersIds.push(participants[0]);
+      }
+
+      if (participantId !== "") {
+        const nameSnapshot = await get(
+          child(databaseRef, `users/${participantId}`)
+        );
+        chats.push({
+          userName: nameSnapshot.val().userInfo.fullName,
+          userId: participantId,
+          lastMessage: snapshot.val()[property].lastMessage,
+          timestamp: snapshot.val()[property].timestamp,
+        });
+      }
+    }
+    console.log(chats);
+    setData(chats);
+    setIsLoading(false);
+    for (const userId of otherUsersIds) {
+      chatId = getChatId(auth.currentUser?.uid, userId);
+
+      const dbRef = ref(getDatabase(), `chats/${chatId}`);
+
+      const unsubscribe = onValue(dbRef, (snapshot) => {
+        const updatedData = snapshot.val();
+        console.log(`${auth.currentUser?.uid}: PLM: `)
+        refetch()
+
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+  return { data, isLoading };
+};
+
+const cancelPost = async (postId) => {
+
+  const db = getDatabase();
+    const nodeRef = ref(db, `users/${auth.currentUser?.uid}/postsApplied/${postId}`);
+    remove(nodeRef)
+      .then(() => {
+        console.log('Entry deleted successfully');
+      })
+      .catch((error) => {
+        console.error('Error deleting entry:', error);
+      });
+
+  const databaseRef = ref(getDatabase());
+  const snapshot = await get(child(databaseRef, `posts/${postId}`));
+  console.log("hey")
+  if (!snapshot.val())
+  {
+    return
+  }
+  else{
+    let usersArray = snapshot.val().appliedUsers
+    let userPostId = snapshot.val().uid
+    const newUsersArray = usersArray.filter((userId) => userId !== auth.currentUser?.uid);
+    const updates = {}
+    updates[`posts/${postId}/appliedUsers`] = newUsersArray;
+    updates[`users/${userPostId}/posts/${postId}/appliedUsers`] = newUsersArray
+    update(ref(db), updates);
+  }
+
+  // const postRef = ref(db, `posts/${postId}/appliedUsers`);
+  // postRef
+  //   .get()
+  //   .then((snapshot) => {
+  //     const currentArray = snapshot.val();
+  //     // const updatedArray = currentArray.filter((id) => id !== auth.currentUser?.uid);
+  //     console.log("---------UPDATED ARRAY-----------")
+  //     console.log(currentArray)
+  //     //return update(postRef, updatedArray);
+  //   })
+  //   .then(() => {
+  //     console.log('ID deleted successfully');
+  //     setDeletedId(idToDelete);
+  //   })
+  //   .catch((error) => {
+  //     console.error('Error deleting ID:', error);
+  //   });
+
+
 }
 
 export {
@@ -398,5 +563,7 @@ export {
   createChat,
   checkChatExists,
   getChatId,
-  sendMessage
+  sendMessage,
+  getUserChats,
+  cancelPost
 };

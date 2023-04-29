@@ -40,6 +40,10 @@ const UserPosts = () => {
     router.push({ pathname: `/EditPost/${key}` });
   };
 
+  const handleViewMembers = (key) => {
+
+  }
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -76,6 +80,12 @@ const UserPosts = () => {
                     onPress={() => handleDelete(key)}
                   >
                     <Text style={styles.buttonText}>Delete post</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleViewMembers(key)}
+                  >
+                    <Text style={styles.buttonText}>Members ({data.appliedUsers? data.appliedUsers.length : 0})</Text>
                   </TouchableOpacity>
                 </View>
               </View>

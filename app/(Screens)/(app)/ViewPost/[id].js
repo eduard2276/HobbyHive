@@ -8,14 +8,11 @@ import {
   Image,
   ActivityIndicator
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import ProfileHeader from "../../../components/profile/ProfileHeader";
 import PostDetails from "../../../components/profile/viewPost/PostDetails";
 import { applyUser, getUserPostAndDetails } from "../../../utils/firebaseUtils";
 import { useRouter, useSearchParams } from "expo-router";
 import Button from "../../../components/auth/Button";
-
-//TO DO: MAKE user view post
 
 const ScrollViewComp = ({ postDetails }) => {
   console.log('\n')
@@ -37,10 +34,12 @@ const Search = () => {
   const onApplyPressed = () => {
     console.log("Apply pressed");
     applyUser(data, params.id.split('\\')[0])
+
   }
 
   const onMessagePressed = () => {
     console.log("MEssage pressed");
+    router.push({ pathname: `/Message/${data.postDetails.uid}` });
   }
 
   return (
