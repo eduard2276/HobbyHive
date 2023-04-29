@@ -41,7 +41,7 @@ const UserPosts = () => {
   };
 
   const handleViewMembers = (key) => {
-
+    router.push({ pathname: `/ViewPostMembers/${key}`})
   }
 
   return (

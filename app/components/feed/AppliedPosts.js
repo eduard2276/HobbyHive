@@ -30,8 +30,7 @@ const AppliedPosts = () => {
 
   const handleCancel = (postId) => {
     console.log("Cancel Pressed")
-    cancelPost(postId)
-
+    cancelPost(postId, auth.currentUser?.uid)
   };
 
 

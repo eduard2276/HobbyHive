@@ -9,7 +9,7 @@ import {
   update,
   get,
   onValue,
-  remove
+  remove,
 } from "firebase/database";
 
 const createUserAccount = (email, password) => {
@@ -162,7 +162,7 @@ const getUserAppliedPosts = () => {
       if (postSnapshot.val()) {
         postsArray.push({
           ...postSnapshot.val(),
-          postId: postId
+          postId: postId,
         });
       }
     }
@@ -432,7 +432,7 @@ const getUserChats = () => {
     }
     setData(chats);
     setIsLoading(false);
-  }
+  };
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -479,9 +479,8 @@ const getUserChats = () => {
 
       const unsubscribe = onValue(dbRef, (snapshot) => {
         const updatedData = snapshot.val();
-        console.log(`${auth.currentUser?.uid}: PLM: `)
-        refetch()
-
+        console.log(`${auth.currentUser?.uid}: PLM: `);
+        refetch();
       });
 
       return () => {
@@ -493,36 +492,37 @@ const getUserChats = () => {
     fetchData();
   }, []);
 
-
   return { data, isLoading };
 };
 
-const cancelPost = async (postId) => {
-
+const cancelPost = async (postId, uid) => {
   const db = getDatabase();
-    const nodeRef = ref(db, `users/${auth.currentUser?.uid}/postsApplied/${postId}`);
-    remove(nodeRef)
-      .then(() => {
-        console.log('Entry deleted successfully');
-      })
-      .catch((error) => {
-        console.error('Error deleting entry:', error);
-      });
+  const nodeRef = ref(
+    db,
+    `users/${uid}/postsApplied/${postId}`
+  );
+  remove(nodeRef)
+    .then(() => {
+      console.log("Entry deleted successfully");
+    })
+    .catch((error) => {
+      console.error("Error deleting entry:", error);
+    });
 
   const databaseRef = ref(getDatabase());
   const snapshot = await get(child(databaseRef, `posts/${postId}`));
-  console.log("hey")
-  if (!snapshot.val())
-  {
-    return
-  }
-  else{
-    let usersArray = snapshot.val().appliedUsers
-    let userPostId = snapshot.val().uid
-    const newUsersArray = usersArray.filter((userId) => userId !== auth.currentUser?.uid);
-    const updates = {}
+  console.log("hey");
+  if (!snapshot.val()) {
+    return;
+  } else {
+    let usersArray = snapshot.val().appliedUsers;
+    let userPostId = snapshot.val().uid;
+    const newUsersArray = usersArray.filter(
+      (userId) => userId !== uid
+    );
+    const updates = {};
     updates[`posts/${postId}/appliedUsers`] = newUsersArray;
-    updates[`users/${userPostId}/posts/${postId}/appliedUsers`] = newUsersArray
+    updates[`users/${userPostId}/posts/${postId}/appliedUsers`] = newUsersArray;
     update(ref(db), updates);
   }
 
@@ -543,9 +543,58 @@ const cancelPost = async (postId) => {
   //   .catch((error) => {
   //     console.error('Error deleting ID:', error);
   //   });
+};
+
+const getListOfMembersFromPostId = (postId) => {
+  const [data, setData] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
 
-}
+
+  const fetchData = async () => {
+    setIsLoading(true);
+
+    const databaseRef = ref(getDatabase());
+
+    const snapshot = await get(
+      child(databaseRef, `posts/${postId}`)
+    );
+    if (!snapshot.val()) {
+      setIsLoading(false);
+      return;
+    }
+    const appliedUsers = snapshot.val().appliedUsers
+    console.log(appliedUsers)
+    let usersDataArray = []
+    for (const user in appliedUsers) {
+      const userId = appliedUsers[user]
+      const userSnapshot = await get(child(databaseRef, `/users/${userId}/userInfo`));
+      console.log(userSnapshot.val())
+      if(userSnapshot.val())
+      {
+        usersDataArray.push({
+          ...userSnapshot.val(),
+          userId: userId
+        })
+      }
+      else{
+        continue
+      }
+    }
+    setData(usersDataArray)
+    setIsLoading(false)
+
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { data, isLoading };
+};
 
 export {
   createUserAccount,
@@ -565,5 +614,6 @@ export {
   getChatId,
   sendMessage,
   getUserChats,
-  cancelPost
+  cancelPost,
+  getListOfMembersFromPostId
 };
