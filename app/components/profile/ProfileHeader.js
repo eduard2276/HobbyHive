@@ -1,14 +1,16 @@
 import { View, Text, StyleSheet, Image } from "react-native";
-import { star } from "../../assets/photos/star.png";
+import { auth } from "../../hook/firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { getImage } from "../../utils/firestoreUtils";
 
 const ProfileHeader = ({ data }) => {
+  const {image} = getImage(auth.currentUser?.uid)
   return (
     <View style={styles.header}>
       <Image
         style={styles.avatar}
         source={{
-          uri: "https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7",
+          uri: image,
         }}
       />
       <View style={styles.informationContainer}>

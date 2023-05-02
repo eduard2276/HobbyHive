@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { auth } from "../../hook/firebase";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import TextInput from "../../components/auth/TextInput";
 import Button from "../../components/auth/Button";
 import { default as Tabs } from "../../components/profile/ProfileTabs";
-import { updateUserInformation } from "../../utils/firebaseUtils";
+import { updateUserInformation, getUserInfo } from "../../utils/firebaseUtils";
 import { useRouter } from "expo-router";
 import { nameValidator as textValidator } from "../../utils/nameValidator";
+import { getImage, uploadImage } from "../../utils/firestoreUtils";
+import * as ImagePicker from 'expo-image-picker';
 
 const GenderTabs = ["Male", "Female", "Other"];
 let AgeTabs = [];
@@ -22,8 +25,41 @@ const EditProfile = () => {
   const [age, setAge] = useState(AgeTabs[0]);
   const [about, setAbout] = useState({ value: "", error: "" });
   const [hobbies, setHobbies] = useState({ value: "", error: "" });
+  const [newImage, setNewImage] = useState(null)
 
-  const router = useRouter();
+  const {image, isLoading} = getImage(auth.currentUser?.uid)
+  const router = useRouter()
+
+  const { data } = getUserInfo(auth.currentUser?.uid);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setNewImage(result.assets[0].uri);
+    }
+  };
+
+  useEffect(() => {
+    if (data.fullName) {
+      console.log(data)
+      setFullName({ value: data.fullName, error: ""})
+      setLocation({ value: data.location, error: ""})
+      setNationality({ value: data.nationality, error: ""})
+      setPhoneNumber({ value: data.phoneNumber, error: ""})
+      setGender({ value: GenderTabs[0], error: ""})
+      setAge({ value: AgeTabs[0], error: ""})
+      setAbout({ value: data.about, error: ""})
+      setHobbies({ value: data.hobbies, error: ""})
+    }
+  }, [data]);
 
   const handleSubmit = () => {
     const nameError = textValidator(fullName.value);
@@ -63,6 +99,10 @@ const EditProfile = () => {
       console.log("Done");
       router.push("/Search");
     });
+    if(newImage)
+    {
+      uploadImage(newImage)
+    }
   };
 
   return (
@@ -72,9 +112,12 @@ const EditProfile = () => {
           <Image
             style={styles.avatar}
             source={{
-              uri: "https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7",
+              uri: newImage ? newImage : image
             }}
           />
+          <TouchableOpacity onPress={pickImage}>
+            <Text> Edit photo </Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.form}>
           <TextInput
