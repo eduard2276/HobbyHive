@@ -62,7 +62,7 @@ const Search = () => {
                     <Image
                       style={styles.itemImage}
                       source={{
-                        uri: "https://scontent.ftsr1-2.fna.fbcdn.net/v/t1.6435-9/212345919_4107898495955116_8238256389218474921_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=09cbfe&_nc_ohc=WXna0Hs24UAAX_xlnty&_nc_ht=scontent.ftsr1-2.fna&oh=00_AfCJqnXxAbUK6AH65_NYdLGhmWzOMQAc7VO2V8hC91i2kw&oe=6443C6F7",
+                        uri: item.url,
                       }}
                     />
                     <View style={styles.itemContent}>

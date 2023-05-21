@@ -9,6 +9,13 @@ const Messages = () => {
   const { data, isLoading } = getUserChats()
   const router = useRouter();
 
+  const getLastMessage = (item) => {
+    if (item.timestamp){
+      return format(item?.timestamp, "h:mm a")
+    }else{
+      return ""
+    }
+  }
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -18,10 +25,10 @@ const Messages = () => {
         data={data}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.itemContainer} onPress={()=>router.push({ pathname: `/Message/${item.userId}` })}>
-            <Image style={styles.image} source={{ uri: 'https://www.bootdey.com/img/Content/avatar/avatar4.png' }} />
+            <Image style={styles.image} source={{ uri: item.imageUrl }} />
             <View style={styles.textContainer}>
               <Text style={styles.nameText}>{item?.userName}</Text>
-              <Text style={styles.phoneText}>{item?.lastMessage} - {format(item?.timestamp, "h:mm a")}</Text>
+              <Text style={styles.phoneText}>{item?.lastMessage} - {getLastMessage(item)}</Text>
             </View>
           </TouchableOpacity>
         )}

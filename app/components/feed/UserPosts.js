@@ -57,7 +57,7 @@ const UserPosts = () => {
             return (
               <View style={styles.card}>
                 <View style={styles.item}>
-                  <Image style={styles.itemImage} />
+
                   <View style={styles.itemContent}>
                     <Text style={styles.itemName}>
                       {data.sport} - {data.numOfPeople} people needed

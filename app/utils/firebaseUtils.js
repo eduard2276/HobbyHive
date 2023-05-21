@@ -11,6 +11,7 @@ import {
   onValue,
   remove,
 } from "firebase/database";
+import { getImageBasedOnUid } from "./firestoreUtils";
 
 const createUserAccount = (email, password) => {
   auth
@@ -18,6 +19,8 @@ const createUserAccount = (email, password) => {
     .then((userCredentials) => {
       const user = userCredentials.user;
       const database = getDatabase();
+      console.log("CREATE CHAT")
+      createChat(auth.currentUser?.uid, "GPT")
       set(ref(database, `users/${auth.currentUser?.uid}`), {
         userInfo: {
           email: email,
@@ -67,18 +70,23 @@ const updateUserInformation = async (userInfo) => {
 };
 
 const getUserInfo = (userUid) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchData = async () => {
     setIsLoading(true);
-
+    const imageUrl = await getImageBasedOnUid(userUid);
+    console.log(imageUrl);
     const databaseRef = ref(getDatabase());
     get(child(databaseRef, `users/${userUid}/userInfo`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          setData(snapshot.val());
+          console.log("############")
+          const ceva = { ...snapshot.val(), imageUrl: imageUrl }
+          console.log(ceva)
+          setData({ ...snapshot.val(), imageUrl: imageUrl });
+
           setIsLoading(false);
         } else {
           setError("No data available");
@@ -156,13 +164,17 @@ const getUserAppliedPosts = () => {
     }));
     console.log(result);
     let postsArray = [];
+
     for (const key in result) {
       const postId = Object.keys(result[key])[0];
       const postSnapshot = await get(child(databaseRef, `/posts/${postId}`));
       if (postSnapshot.val()) {
+        const userId = postSnapshot.val().uid;
+        const imageUrl = await getImageBasedOnUid(userId);
         postsArray.push({
           ...postSnapshot.val(),
           postId: postId,
+          imageUrl: imageUrl,
         });
       }
     }
@@ -274,22 +286,62 @@ const getAllPosts = () => {
     setIsLoading(true);
 
     const databaseRef = ref(getDatabase());
-    get(child(databaseRef, "/posts"))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const result = Object.keys(snapshot.val()).map((key) => ({
-            [key]: snapshot.val()[key],
-          }));
-          setData(result);
-          setIsLoading(false);
-        } else {
-          setData([]);
-          setError("No data available");
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
+
+    const snapshot = await get(child(databaseRef, "/posts"));
+    if (!snapshot.val()) {
+      setIsLoading(false);
+      return;
+    }
+    const result = Object.keys(snapshot.val()).map((key) => ({
+      [key]: snapshot.val()[key],
+    }));
+
+    let updatedData = [];
+    for (let i = 0; i < result.length; i++) {
+      const post = result[i];
+      const postId = Object.keys(post)[0];
+      const userId = post[postId].uid;
+      console.log(userId);
+      const imageUrl = await getImageBasedOnUid(userId);
+      console.log(imageUrl);
+      updatedData.push({
+        ...post,
+        url: imageUrl,
       });
+    }
+    setData(updatedData);
+    setIsLoading(false);
+    // result.forEach((post) => {
+    //   const postId = Object.keys(post)[0]
+    //   const userId = post[postId].uid
+    //   const imageUrl = await getImageBasedOnUid(userId)
+    //   console.log(imageUrl)
+    // });
+
+    // get(child(databaseRef, "/posts"))
+    //   .then((snapshot) => {
+    //     if (snapshot.exists()) {
+    //       const result = Object.keys(snapshot.val()).map((key) => ({
+    //         [key]: snapshot.val()[key],
+    //       }));
+    //       let updatedData = []
+
+    //       result.forEach((post) => {
+    //         const postId = Object.keys(post)[0]
+    //         const userId = post[postId].uid
+    //         const imageUrl = await getImageBasedOnUid(userId)
+    //         console.log(imageUrl)
+    //       });
+    //       setData(result);
+    //       setIsLoading(false);
+    //     } else {
+    //       setData([]);
+    //       setError("No data available");
+    //     }
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
   };
   useEffect(() => {
     fetchData();
@@ -346,11 +398,12 @@ const getChatId = (userId1, userId2) => {
 };
 
 const createChat = (userId1, userId2) => {
-  if (checkChatExists(userId1, userId2)) {
+  if (checkChatExists(userId1, userId2) === true) {
     return;
   }
   let chatId = getChatId(userId1, userId2);
   const database = getDatabase();
+  console.log("#############CREATE_CHATS#############")
   console.log(createChat);
   set(ref(database, `/chats/${chatId}`), {
     participants: [userId1, userId2],
@@ -371,12 +424,12 @@ const checkChatExists = async (userId1, userId2) => {
   }
 };
 
-const sendMessage = ({ _id, fullName, timestamp, message, to }) => {
-  let chatId = getChatId(auth.currentUser?.uid, to);
+const sendMessage = ({ _id, fullName, timestamp, message, from, to }) => {
+  let chatId = getChatId(from, to);
   const database = getDatabase();
 
   set(ref(database, `/messages/${chatId}/${timestamp}`), {
-    uid: auth.currentUser?.uid,
+    uid: from,
     _id: _id,
     timestamp: timestamp,
     message: message,
@@ -384,7 +437,7 @@ const sendMessage = ({ _id, fullName, timestamp, message, to }) => {
   });
 
   let postData = {
-    participants: [auth.currentUser?.uid, to],
+    participants: [from, to],
     lastMessage: message,
     timestamp: timestamp,
   };
@@ -422,11 +475,13 @@ const getUserChats = () => {
         const nameSnapshot = await get(
           child(databaseRef, `users/${participantId}`)
         );
+        const imageUrl = await getImageBasedOnUid(participantId);
         chats.push({
           userName: nameSnapshot.val().userInfo.fullName,
           userId: participantId,
           lastMessage: snapshot.val()[property].lastMessage,
           timestamp: snapshot.val()[property].timestamp,
+          imageUrl: imageUrl,
         });
       }
     }
@@ -436,7 +491,7 @@ const getUserChats = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-
+    console.log("fetch")
     const databaseRef = ref(getDatabase());
     const snapshot = await get(child(databaseRef, `chats`));
     if (!snapshot.val()) {
@@ -461,11 +516,13 @@ const getUserChats = () => {
         const nameSnapshot = await get(
           child(databaseRef, `users/${participantId}`)
         );
+        const imageUrl = await getImageBasedOnUid(participantId);
         chats.push({
           userName: nameSnapshot.val().userInfo.fullName,
           userId: participantId,
           lastMessage: snapshot.val()[property].lastMessage,
           timestamp: snapshot.val()[property].timestamp,
+          imageUrl: imageUrl,
         });
       }
     }
@@ -497,10 +554,7 @@ const getUserChats = () => {
 
 const cancelPost = async (postId, uid) => {
   const db = getDatabase();
-  const nodeRef = ref(
-    db,
-    `users/${uid}/postsApplied/${postId}`
-  );
+  const nodeRef = ref(db, `users/${uid}/postsApplied/${postId}`);
   remove(nodeRef)
     .then(() => {
       console.log("Entry deleted successfully");
@@ -517,9 +571,7 @@ const cancelPost = async (postId, uid) => {
   } else {
     let usersArray = snapshot.val().appliedUsers;
     let userPostId = snapshot.val().uid;
-    const newUsersArray = usersArray.filter(
-      (userId) => userId !== uid
-    );
+    const newUsersArray = usersArray.filter((userId) => userId !== uid);
     const updates = {};
     updates[`posts/${postId}/appliedUsers`] = newUsersArray;
     updates[`users/${userPostId}/posts/${postId}/appliedUsers`] = newUsersArray;
@@ -549,41 +601,38 @@ const getListOfMembersFromPostId = (postId) => {
   const [data, setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-
-
   const fetchData = async () => {
     setIsLoading(true);
 
     const databaseRef = ref(getDatabase());
 
-    const snapshot = await get(
-      child(databaseRef, `posts/${postId}`)
-    );
+    const snapshot = await get(child(databaseRef, `posts/${postId}`));
     if (!snapshot.val()) {
       setIsLoading(false);
       return;
     }
-    const appliedUsers = snapshot.val().appliedUsers
-    console.log(appliedUsers)
-    let usersDataArray = []
+    const appliedUsers = snapshot.val().appliedUsers;
+    console.log(appliedUsers);
+    let usersDataArray = [];
     for (const user in appliedUsers) {
-      const userId = appliedUsers[user]
-      const userSnapshot = await get(child(databaseRef, `/users/${userId}/userInfo`));
-      console.log(userSnapshot.val())
-      if(userSnapshot.val())
-      {
+      const userId = appliedUsers[user];
+      const imageUrl = await getImageBasedOnUid(userId)
+      const userSnapshot = await get(
+        child(databaseRef, `/users/${userId}/userInfo`)
+      );
+      console.log(userSnapshot.val());
+      if (userSnapshot.val()) {
         usersDataArray.push({
           ...userSnapshot.val(),
-          userId: userId
-        })
-      }
-      else{
-        continue
+          userId: userId,
+          imageUrl: imageUrl
+        });
+      } else {
+        continue;
       }
     }
-    setData(usersDataArray)
-    setIsLoading(false)
-
+    setData(usersDataArray);
+    setIsLoading(false);
   };
   useEffect(() => {
     fetchData();
@@ -615,5 +664,5 @@ export {
   sendMessage,
   getUserChats,
   cancelPost,
-  getListOfMembersFromPostId
+  getListOfMembersFromPostId,
 };

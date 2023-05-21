@@ -1,35 +1,26 @@
 import { useState, useEffect, useCallback } from "react";
 import { View, Text, TextInput, Button } from "react-native";
 import { auth } from "../../../hook/firebase";
-import {
-  getDatabase,
-  ref,
-  child,
-  onValue,
-  push,
-  update,
-  orderByChild,
-  equalTo,
-} from "@firebase/database";
+import { getDatabase, ref, onValue } from "@firebase/database";
 import {
   createChat,
-  checkChatExists,
   getChatId,
   getUserInfo,
-  sendMessage
+  sendMessage,
 } from "../../../utils/firebaseUtils";
 import { GiftedChat } from "react-native-gifted-chat";
 import { useRouter, useSearchParams } from "expo-router";
+import query from "../../../utils/queryApi";
 
 const Messages = () => {
   const params = useSearchParams();
-
-  const { data, isLoading, error } = getUserInfo(auth.currentUser?.uid);
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-
   const userId1 = auth.currentUser?.uid;
   const userId2 = params.id;
+
+  const { data, isLoading, error } = getUserInfo(userId2);
+
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
 
   // Load messages for this chat from Firebase
   useEffect(() => {
@@ -37,48 +28,58 @@ const Messages = () => {
     const chatId = getChatId(userId1, userId2);
     const dbRef = ref(getDatabase(), `messages/${chatId}`);
     const unsubscribe = onValue(dbRef, (snapshot) => {
-      let messages = []
+      let messages = [];
       for (const property in snapshot.val()) {
-
         messages.push({
-            _id: snapshot.val()[property]._id,
-            text: snapshot.val()[property].message,
-            createdAt: snapshot.val()[property].timestamp,
-            user: {
-                _id: snapshot.val()[property].uid
-            }
-        })
+          _id: snapshot.val()[property]._id,
+          text: snapshot.val()[property].message,
+          createdAt: snapshot.val()[property].timestamp,
+          user: {
+            _id: snapshot.val()[property].uid,
+            avatar: data.imageUrl,
+          },
+        });
       }
       messages.sort((a, b) => {
         return b.createdAt - a.createdAt;
       });
-      setMessages(messages)
+      setMessages(messages);
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [data]);
 
   const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
+    setMessages((previousMessages) =>
+      GiftedChat.append(previousMessages, messages)
+    );
     const { _id, createdAt, text, user } = messages[0];
     sendMessage({
-        _id: _id,
-        fullName: "data.fullName",
-        timestamp: Date.now(),
-        message: text,
-        to: userId2
-    })
+      _id: _id,
+      fullName: "data.fullName",
+      timestamp: Date.now(),
+      message: text,
+      from: auth.currentUser?.uid,
+      to: userId2,
+    });
 
+    if (userId2 === "GPT")
+    {
+      const response = query(_id, text);
+    }
   }, []);
 
   return (
     <GiftedChat
-        messages={messages}
-        onSend={(messages) => onSend(messages)}
-        user={{_id: auth.currentUser?.uid}}
-        />
+      messages={messages}
+      onSend={(messages) => onSend(messages)}
+      user={{
+        _id: auth.currentUser?.uid,
+        avatar: "https://www.bootdey.com/img/Content/avatar/avatar4.png",
+      }}
+    />
   );
 };
 

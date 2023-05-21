@@ -54,12 +54,17 @@ const EditProfile = () => {
       setLocation({ value: data.location, error: ""})
       setNationality({ value: data.nationality, error: ""})
       setPhoneNumber({ value: data.phoneNumber, error: ""})
-      setGender({ value: GenderTabs[0], error: ""})
-      setAge({ value: AgeTabs[0], error: ""})
+      setGender(data.gender)
+      setAge(data.age)
       setAbout({ value: data.about, error: ""})
       setHobbies({ value: data.hobbies, error: ""})
     }
   }, [data]);
+
+  useEffect(() => {
+    console.log("Gender has been modified")
+    console.log(gender.value)
+  }, [gender]);
 
   const handleSubmit = () => {
     const nameError = textValidator(fullName.value);

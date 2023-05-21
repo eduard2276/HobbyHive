@@ -8,8 +8,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { default as Tabs }  from "../profile/ProfileTabs";
-import { cancelPost, deleteUserPost, getUserAppliedPosts } from "../../utils/firebaseUtils";
+import { default as Tabs } from "../profile/ProfileTabs";
+import {
+  cancelPost,
+  deleteUserPost,
+  getUserAppliedPosts,
+} from "../../utils/firebaseUtils";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 
@@ -29,10 +33,9 @@ const AppliedPosts = () => {
   };
 
   const handleCancel = (postId) => {
-    console.log("Cancel Pressed")
-    cancelPost(postId, auth.currentUser?.uid)
+    console.log("Cancel Pressed");
+    cancelPost(postId, auth.currentUser?.uid);
   };
-
 
   return (
     <View style={styles.container}>
@@ -46,7 +49,12 @@ const AppliedPosts = () => {
             return (
               <View style={styles.card}>
                 <View style={styles.item}>
-                  <Image style={styles.itemImage} />
+                  <Image
+                    style={styles.itemImage}
+                    source={{
+                      uri: data.imageUrl,
+                    }}
+                  />
                   <View style={styles.itemContent}>
                     <Text style={styles.itemName}>
                       {data.sport} - {data.numOfPeople} people needed
@@ -60,7 +68,9 @@ const AppliedPosts = () => {
                 <View style={styles.buttons}>
                   <TouchableOpacity
                     style={styles.button}
-                    onPress={() => router.push({ pathname: `/Message/${data.uid}` })}
+                    onPress={() =>
+                      router.push({ pathname: `/Message/${data.uid}` })
+                    }
                   >
                     <Text style={styles.buttonText}>Message User</Text>
                   </TouchableOpacity>

@@ -29,7 +29,7 @@ const Messages = () => {
               <Image
                 style={styles.image}
                 source={{
-                  uri: "https://www.bootdey.com/img/Content/avatar/avatar4.png",
+                  uri: item.imageUrl,
                 }}
               />
               <View style={styles.textContainer}>
