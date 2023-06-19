@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { default as Tabs }  from "../profile/ProfileTabs";
+import { default as Tabs } from "../profile/ProfileTabs";
 import { getUserPosts, deleteUserPost } from "../../utils/firebaseUtils";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
+import { theme } from "../../constants/theme";
+import Icon from "react-native-vector-icons/AntDesign";
 
 const UserPosts = () => {
   const { data, isLoading, error, refetch } = getUserPosts();
@@ -41,8 +43,8 @@ const UserPosts = () => {
   };
 
   const handleViewMembers = (key) => {
-    router.push({ pathname: `/ViewPostMembers/${key}`})
-  }
+    router.push({ pathname: `/ViewPostMembers/${key}` });
+  };
 
   return (
     <View style={styles.container}>
@@ -57,7 +59,6 @@ const UserPosts = () => {
             return (
               <View style={styles.card}>
                 <View style={styles.item}>
-
                   <View style={styles.itemContent}>
                     <Text style={styles.itemName}>
                       {data.sport} - {data.numOfPeople} people needed
@@ -73,20 +74,45 @@ const UserPosts = () => {
                     style={styles.button}
                     onPress={() => handleUpdate(key, data)}
                   >
-                    <Text style={styles.buttonText}>Edit post</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => handleDelete(key)}
-                  >
-                    <Text style={styles.buttonText}>Delete post</Text>
+                    <Icon
+                      name="edit"
+                      size={25}
+                      color={"white"}
+                      style={styles.searchBtnImage}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.buttonText}>
+                      {" Edit Post"}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.button}
                     onPress={() => handleViewMembers(key)}
                   >
-                    <Text style={styles.buttonText}>Members ({data.appliedUsers? data.appliedUsers.length : 0})</Text>
+                    <Icon
+                      name="user"
+                      size={25}
+                      color={"white"}
+                      style={styles.searchBtnImage}
+                      resizeMode="contain"
+                    />
+                    <Text style={styles.buttonText}>
+                      ({data.appliedUsers ? data.appliedUsers.length : 0})
+                    </Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleDelete(key)}
+                  >
+                    <Icon
+                      name="delete"
+                      size={25}
+                      color={"white"}
+                      style={styles.searchBtnImage}
+                      resizeMode="contain"
+                    />
+                  </TouchableOpacity>
+
                 </View>
               </View>
             );
@@ -104,6 +130,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 10,
+    backgroundColor: theme.colors.background,
   },
   backgroundImage: {
     position: "absolute",
@@ -123,7 +150,7 @@ const styles = StyleSheet.create({
   },
   card: {
     marginHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.primary,
     borderRadius: 10,
     padding: 20,
     shadowColor: "#000",
@@ -160,14 +187,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#FFC107",
+    backgroundColor: theme.colors.secondary,
     borderRadius: 5,
     padding: 10,
-    marginRight: 10,
+    marginRight: 30,
+    flexDirection: "row",
+
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  searchBtn: {
+    width: 50,
+    height: "100%",
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchBtnImage: {
+    // width: "50%",
+    // height: "50%",
+    //tintColor: "#F3F4F8",
   },
 });

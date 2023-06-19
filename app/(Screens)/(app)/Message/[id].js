@@ -8,9 +8,10 @@ import {
   getUserInfo,
   sendMessage,
 } from "../../../utils/firebaseUtils";
-import { GiftedChat } from "react-native-gifted-chat";
-import { useRouter, useSearchParams } from "expo-router";
+import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { useRouter, useSearchParams, Stack } from "expo-router";
 import query from "../../../utils/queryApi";
+import { theme } from "../../../constants/theme";
 
 const Messages = () => {
   const params = useSearchParams();
@@ -65,21 +66,55 @@ const Messages = () => {
       to: userId2,
     });
 
-    if (userId2 === "GPT")
-    {
+    if (userId2 === "GPT") {
       const response = query(_id, text);
     }
   }, []);
 
   return (
-    <GiftedChat
-      messages={messages}
-      onSend={(messages) => onSend(messages)}
-      user={{
-        _id: auth.currentUser?.uid,
-        avatar: "https://www.bootdey.com/img/Content/avatar/avatar4.png",
-      }}
-    />
+    <>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Chat",
+          headerTitleStyle: { color: theme.colors.primary },
+        }}
+      />
+      <GiftedChat
+        messages={messages}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: auth.currentUser?.uid,
+          avatar: "https://www.bootdey.com/img/Content/avatar/avatar4.png",
+        }}
+        messagesContainerStyle={{ backgroundColor: theme.colors.background }}
+        renderBubble={(props) => {
+          return (
+            <Bubble
+              {...props}
+              textStyle={{
+                right: {
+                  color: theme.colors.text,
+                },
+                left: {
+                  color: "#24204F",
+                },
+              }}
+              wrapperStyle={{
+                left: {
+                  backgroundColor: theme.colors.primary,
+                },
+                right: {
+                  backgroundColor: "#3A13C3",
+                },
+              }}
+            />
+          );
+        }}
+      />
+    </>
   );
 };
 

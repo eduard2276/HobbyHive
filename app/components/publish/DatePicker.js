@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { Button, View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
+import Button from "../auth/Button";
 import { format } from "date-fns";
+import { theme } from "../../constants/theme";
 
 const DatePicker = ({ text, setDate, settedDate, setFormatedDate }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -24,7 +26,9 @@ const DatePicker = ({ text, setDate, settedDate, setFormatedDate }) => {
   };
   return (
     <View style={styles.container}>
-      <Button title={text} onPress={showDatePicker} />
+      <Button style={styles.button} title={text} onPress={showDatePicker} mode="contained">
+        <Text>{text}</Text>
+      </Button>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
@@ -42,4 +46,12 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 20,
   },
+  button: {
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 50,
+    // padding: 10,
+    // marginRight: 30,
+    // flexDirection: "row",
+  }
+
 });

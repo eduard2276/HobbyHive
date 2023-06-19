@@ -2,9 +2,10 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { auth } from "../../hook/firebase";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { getImage } from "../../utils/firestoreUtils";
+import { theme } from "../../constants/theme";
 
-const ProfileHeader = ({ data }) => {
-  const {image} = getImage(auth.currentUser?.uid)
+const ProfileHeader = ({ data, details }) => {
+  const {image} = details ? getImage(details?.uid) : getImage(auth.currentUser?.uid)
   return (
     <View style={styles.header}>
       <Image
@@ -17,21 +18,15 @@ const ProfileHeader = ({ data }) => {
         <Text style={styles.name}>{data?.fullName}</Text>
         <View style={styles.userInfoSection}>
           <View style={styles.basicInfo}>
-            <Icon name="phone" color="#777777" size={20} />
-            <Text style={{ color: "#777777", marginLeft: 1 }}>
+            <Icon name="phone" color={theme.colors.text} size={20} />
+            <Text style={{ color: theme.colors.text, marginLeft: 1 }}>
               {data?.phoneNumber}
             </Text>
           </View>
           <View style={styles.basicInfo}>
-            <Icon name="email" color="#777777" size={20} />
-            <Text style={{ color: "#777777", marginLeft: 1 }}>
+            <Icon name="email" color={theme.colors.text} size={20} />
+            <Text style={{ color: theme.colors.text, marginLeft: 1 }}>
               {data?.email}
-            </Text>
-          </View>
-          <View style={styles.basicInfo}>
-            <Icon name="star" color="#8B8000" size={20} />
-            <Text style={{ color: "#777777", marginLeft: 1 }}>
-              - {data?.stars ? data?.stars : ""}
             </Text>
           </View>
         </View>
@@ -45,14 +40,13 @@ export default ProfileHeader;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
   },
   header: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.background,
     height: 150,
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 16,
+    paddingTop: 0,
     paddingHorizontal: 16,
   },
   avatar: {
@@ -61,6 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   userInfoSection: {
+    paddingTop: 5,
     paddingHorizontal: 0,
     marginBottom: 25,
   },
@@ -71,12 +66,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   basicInfo: {
+    paddingTop: 2,
     flexDirection: "row",
     marginBottom: 0,
   },
   name: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#000000",
+    color: theme.colors.primary,
   },
 });

@@ -16,6 +16,7 @@ import AboutSectionTab from "../../components/profile/tabs/AboutSectionTab";
 import ReviewsSectionTab from "../../components/profile/tabs/ReviewsSectionTab";
 import { getUserInfo } from "../../utils/firebaseUtils";
 import { useRouter, Stack } from "expo-router";
+import { theme } from "../../constants/theme";
 
 const tabs = ["About", "Reviews"];
 
@@ -38,7 +39,7 @@ const Profile = () => {
     <SafeAreaView style={styles.container}>
       <Stack.Screen
         options={{
-          headerStyle: { backgroundColor: "#FFF" },
+          headerStyle: { backgroundColor: theme.colors.background },
           headerShadowVisible: false,
           headerBackVisible: false,
           headerRight: () => (
@@ -74,7 +75,7 @@ export default Profile;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.background,
     flex: 1,
   },
 });

@@ -42,4 +42,9 @@ const getImageBasedOnUid = async (uid) => {
   const snapshot = await getDownloadURL(reference);
   return snapshot;
 };
-export { uploadImage, getImage, getImageBasedOnUid };
+
+export {
+  uploadImage,
+  getImage,
+  getImageBasedOnUid
+};

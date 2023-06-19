@@ -1,6 +1,7 @@
 import React from "react";
 import {default as Tabs} from "../profile/ProfileTabs";
 import { View, Text, StyleSheet } from "react-native";
+import { theme } from "../../constants/theme";
 
 const Selector = ({text, tabs, activeTab, setActiveTab}) => {
     return (
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
     title:{
       fontSize:20,
       fontWeight: 'bold',
-    
+      color: theme.colors.primary
     },
     selector:{
       paddingTop:20,
@@ -30,4 +31,3 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
     }
   });
-  

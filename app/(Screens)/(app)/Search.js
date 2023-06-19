@@ -7,18 +7,20 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Modal
 } from "react-native";
 import {default as Menu} from "../../components/common/Footer";
 import { getAllPosts } from "../../utils/firebaseUtils";
 import { format } from "date-fns";
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import Searchcomponent from "../../components/search/Searchcomponent";
 import { auth } from "../../hook/firebase";
-
+import { theme } from "../../constants/theme";
 
 const Search = () => {
   const { data, isLoading, error, refetch } = getAllPosts();
   const [searchTerm, setSearchTerm] = useState("")
+  const [filters, setFilters] = useState({})
   const router = useRouter();
 
   const getKey = (item) => {
@@ -39,12 +41,46 @@ const Search = () => {
     }
     return data?.numOfPeople
   }
+
+  const showPost = (data) => {
+    if (data?.uid == auth.currentUser?.uid)
+    {
+      return false
+    }
+    if (getAvailableSpots(data) === 0)
+    {
+      return false
+    }
+    console.log(filters.numOfPeople)
+    console.log("----------")
+    console.log(data)
+    // if (filters.numOfPeople != "Any" && parseInt(data.numOfPeople) != parseInt(filters.numOfPeople))
+    // {
+    //   console.log("Aci")
+    //   return false
+    // }
+    // if (filters.otherUsersLevel != "" && filters.otherUsersLevel != data.otherUsersLevel)
+    // {
+    //   //return false
+    // }
+
+    return true
+  }
   return (
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Search",
+        }}
+      />
       <Searchcomponent
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         handleClick = {() => {}}
+        setFilters={setFilters}
       />
       {isLoading ? (
         <ActivityIndicator size="large" />
@@ -54,7 +90,7 @@ const Search = () => {
           renderItem={({ item }) => {
             const key = getKey(item);
             const data = item[key];
-            if (data?.uid != auth.currentUser?.uid)
+            if (showPost(data))
             {
               return (
                 <TouchableOpacity style={styles.card} onPress={() => {router.push({ pathname: `/ViewPost/${getKey(item)}\\${data.uid}` });}}>
@@ -95,7 +131,7 @@ export default Search;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF"
+    backgroundColor: theme.colors.background
   },
   title: {
     fontSize: 24,
@@ -107,7 +143,7 @@ const styles = StyleSheet.create({
   },
   card: {
     marginHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.primary,
     borderRadius: 15,
     padding: 20,
     shadowColor: "#000",
@@ -159,4 +195,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+
 });

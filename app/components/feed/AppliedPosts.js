@@ -8,14 +8,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { default as Tabs } from "../profile/ProfileTabs";
 import {
   cancelPost,
-  deleteUserPost,
   getUserAppliedPosts,
 } from "../../utils/firebaseUtils";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
+import { theme } from "../../constants/theme";
+import { auth } from "../../hook/firebase";
 
 const AppliedPosts = () => {
   const { data, isLoading, refetch } = getUserAppliedPosts();
@@ -35,6 +35,7 @@ const AppliedPosts = () => {
   const handleCancel = (postId) => {
     console.log("Cancel Pressed");
     cancelPost(postId, auth.currentUser?.uid);
+    router.replace("/MyPublishes");
   };
 
   return (
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   },
   card: {
     marginHorizontal: 20,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.primary,
     borderRadius: 10,
     padding: 20,
     shadowColor: "#000",
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   button: {
-    backgroundColor: "#FFC107",
+    backgroundColor: theme.colors.secondary,
     borderRadius: 5,
     padding: 10,
     marginRight: 10,

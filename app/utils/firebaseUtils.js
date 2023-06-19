@@ -13,22 +13,15 @@ import {
 } from "firebase/database";
 import { getImageBasedOnUid } from "./firestoreUtils";
 
-const createUserAccount = (email, password) => {
-  auth
-    .createUserWithEmailAndPassword(email, password)
-    .then((userCredentials) => {
-      const user = userCredentials.user;
-      const database = getDatabase();
-      console.log("CREATE CHAT")
-      createChat(auth.currentUser?.uid, "GPT")
-      set(ref(database, `users/${auth.currentUser?.uid}`), {
-        userInfo: {
-          email: email,
-          isProfileReady: false,
-        },
-      });
-    })
-    .catch((error) => alert(error.message));
+const createUserAccount = (email) => {
+  const database = getDatabase();
+  createChat(auth.currentUser?.uid, "GPT");
+  set(ref(database, `users/${auth.currentUser?.uid}`), {
+    userInfo: {
+      email: email,
+      isProfileReady: false,
+    },
+  });
 };
 
 const createNewPost = (data) => {
@@ -82,9 +75,9 @@ const getUserInfo = (userUid) => {
     get(child(databaseRef, `users/${userUid}/userInfo`))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          console.log("############")
-          const ceva = { ...snapshot.val(), imageUrl: imageUrl }
-          console.log(ceva)
+          console.log("############");
+          const ceva = { ...snapshot.val(), imageUrl: imageUrl };
+          console.log(ceva);
           setData({ ...snapshot.val(), imageUrl: imageUrl });
 
           setIsLoading(false);
@@ -403,7 +396,7 @@ const createChat = (userId1, userId2) => {
   }
   let chatId = getChatId(userId1, userId2);
   const database = getDatabase();
-  console.log("#############CREATE_CHATS#############")
+  console.log("#############CREATE_CHATS#############");
   console.log(createChat);
   set(ref(database, `/chats/${chatId}`), {
     participants: [userId1, userId2],
@@ -491,7 +484,7 @@ const getUserChats = () => {
 
   const fetchData = async () => {
     setIsLoading(true);
-    console.log("fetch")
+    console.log("fetch");
     const databaseRef = ref(getDatabase());
     const snapshot = await get(child(databaseRef, `chats`));
     if (!snapshot.val()) {
@@ -616,7 +609,7 @@ const getListOfMembersFromPostId = (postId) => {
     let usersDataArray = [];
     for (const user in appliedUsers) {
       const userId = appliedUsers[user];
-      const imageUrl = await getImageBasedOnUid(userId)
+      const imageUrl = await getImageBasedOnUid(userId);
       const userSnapshot = await get(
         child(databaseRef, `/users/${userId}/userInfo`)
       );
@@ -625,7 +618,7 @@ const getListOfMembersFromPostId = (postId) => {
         usersDataArray.push({
           ...userSnapshot.val(),
           userId: userId,
-          imageUrl: imageUrl
+          imageUrl: imageUrl,
         });
       } else {
         continue;

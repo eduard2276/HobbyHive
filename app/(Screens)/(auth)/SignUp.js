@@ -11,6 +11,7 @@ import { theme } from "../../constants/theme";
 import { emailValidator } from "../../utils/emailValidator";
 import { passwordValidator } from "../../utils/passwordValidator";
 import { createUserAccount } from "../../utils/firebaseUtils";
+import { auth } from "../../hook/firebase";
 
 export default function SignUp({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
@@ -25,12 +26,27 @@ export default function SignUp({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-    createUserAccount(email.value, password.value);
-    router.push("/EditProfile");
+    auth
+    .createUserWithEmailAndPassword(email.value, password.value)
+    .then((userCredentials) => {
+      createUserAccount(email.value);
+      router.push("/EditProfile");
+    })
+    .catch((error) => {
+      alert(error.message)
+    });
   };
 
   return (
     <Background>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Sign Up",
+        }}
+      />
       <Logo />
       <Header>Create Account</Header>
       <TextInput
@@ -44,6 +60,9 @@ export default function SignUp({ navigation }) {
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
+        selectionColor="white"
+        outlineColor="white"
+        activeOutlineColor="yellow"
       />
       <TextInput
         label="Password"
@@ -53,6 +72,9 @@ export default function SignUp({ navigation }) {
         error={!!password.error}
         errorText={password.error}
         secureTextEntry
+        selectionColor="white"
+        outlineColor="white"
+        activeOutlineColor="yellow"
       />
       <Button
         mode="contained"
@@ -78,6 +100,6 @@ const styles = StyleSheet.create({
   },
   link: {
     fontWeight: "bold",
-    color: theme.colors.primary,
+    color: theme.colors.secondary,
   },
 });

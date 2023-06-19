@@ -2,6 +2,7 @@ import React from 'react'
 import { Text, View, StyleSheet, Image } from 'react-native'
 import { color } from 'react-native-reanimated'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import { theme } from '../../../constants/theme'
 
 const AboutSectionTab = ({data}) => {
   return (
@@ -23,7 +24,7 @@ const AboutSectionTab = ({data}) => {
 
       <View style={styles.infoSection}>
         <View style={styles.infoSectionTitleWrapper}>
-          <Icon name="map-marker" size={30}/>
+          <Icon name="map-marker" color={theme.colors.primary} size={30}/>
           <Text style={styles.infoSectionTitle}>Location</Text>
         </View>
         <Text style={styles.infoSectionContent}>{data.location}</Text>
@@ -31,7 +32,7 @@ const AboutSectionTab = ({data}) => {
 
       <View style={styles.infoSection}>
         <View style={styles.infoSectionTitleWrapper}>
-          <Icon name="exclamation-thick" size={30}/>
+          <Icon name="exclamation-thick" color={theme.colors.primary} size={30}/>
           <Text style={styles.infoSectionTitle}>About</Text>
         </View>
         <Text style={styles.infoSectionContent}>{data.about}</Text>
@@ -39,7 +40,7 @@ const AboutSectionTab = ({data}) => {
 
       <View style={styles.infoSection}>
         <View style={styles.infoSectionTitleWrapper}>
-          <Icon name="heart" size={30}/>
+          <Icon name="heart" size={30} color={theme.colors.primary}/>
           <Text style={styles.infoSectionTitle}>Hobbyes</Text>
         </View>
         <Text style={styles.infoSectionContent}>{data.hobbies}</Text>
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
 
   },
   basicInfoContainer:{
-    borderBottomColor: '#dddddd',
+    borderBottomColor: theme.colors.secondary,
     borderBottomWidth: 1,
     flexDirection: 'row',
     height: 80,
@@ -79,10 +80,12 @@ const styles = StyleSheet.create({
   basicInfoTitle:{
     fontWeight: "bold",
     fontSize: 16,
-    color: '#808080'
+    color: theme.colors.primary
   },
   basicInfoValue:{
-
+    paddingTop: 5,
+    fontWeight: 'bold',
+    color: theme.colors.text
   },
   infoSection:{
     height: 80,
@@ -98,9 +101,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     fontWeight: "bold",
+    color: theme.colors.primary
   },
   infoSectionContent:{
     fontSize:16,
-    paddingLeft: 30
+    paddingLeft: 30,
+    color: theme.colors.text
   }
 })

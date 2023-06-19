@@ -2,51 +2,35 @@ import { View, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { Stack } from "expo-router";
 import { useRouter } from "expo-router";
 import { Image } from "react-native";
+import { theme } from "../../constants/theme";
 
-const Footer = () => {
+const MenuButton = ({route, image}) => {
   const router = useRouter();
   return (
+    <TouchableOpacity
+        onPress={() => {
+          if ( route === "/Publish")
+          {
+            router.push(route)
+          }
+          router.replace(route);
+        }}
+        style={styles.likeBtn}
+      >
+        <Image resizeMode="contain" style={styles.likeBtnImage} source={image}/>
+      </TouchableOpacity>
+  )
+}
+
+
+const Footer = () => {
+  return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/Search");
-        }}
-        style={styles.likeBtn}
-      >
-        <Image resizeMode="contain" style={styles.likeBtnImage} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/Publish");
-        }}
-        style={styles.likeBtn}
-      >
-        <Image resizeMode="contain" style={styles.likeBtnImage} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/MyPublishes");
-        }}
-        style={styles.likeBtn}
-      >
-        <Image resizeMode="contain" style={styles.likeBtnImage} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/Messages");
-        }}
-        style={styles.likeBtn}
-      >
-        <Image resizeMode="contain" style={styles.likeBtnImage} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/Profile");
-        }}
-        style={styles.likeBtn}
-      >
-        <Image resizeMode="contain" style={styles.likeBtnImage} />
-      </TouchableOpacity>
+      <MenuButton route="/Search" image={require('../../assets/photos/search.png')}/>
+      <MenuButton route="/MyPublishes" image={require('../../assets/photos/file.png')}/>
+      <MenuButton route="/Publish" image={require('../../assets/photos/add.png')}/>
+      <MenuButton route="/Messages" image={require('../../assets/photos/messenger.png')}/>
+      <MenuButton route="/Profile" image={require('../../assets/photos/user.png')}/>
     </View>
   );
 };
@@ -64,12 +48,13 @@ styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     flexDirection: "row",
+    backgroundColor: theme.colors.menuColor
   },
   likeBtn: {
-    width: 55,
-    height: 55,
+    width: 45,
+    height: 45,
     borderWidth: 1,
-    borderColor: "#F37453",
+    borderColor: theme.colors.primary,
     borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -77,7 +62,7 @@ styles = StyleSheet.create({
   likeBtnImage: {
     width: "40%",
     height: "40%",
-    tintColor: "#F37453",
+    tintColor: theme.colors.primary,
   },
   applyBtn: {
     flex: 1,

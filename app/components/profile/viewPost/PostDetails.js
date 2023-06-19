@@ -2,13 +2,14 @@ import React from 'react'
 import { View, Text, StyleSheet} from 'react-native'
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { dateFormatter } from '../../../utils/dateFormatter';
+import { theme } from '../../../constants/theme';
 
 const DetailSection = ({icon, title, content}) => {
     return (
         <View style={styles.postDetailsSection}>
             <View style={styles.postDetailsSectionTitle}>
                 <View style={{flexDirection:'row'}}>
-                    <Icon name={icon} size={20}/>
+                    <Icon name={icon} size={20} color={theme.colors.secondary}/>
                     <Text style={styles.postDetailsLabel}> {title}</Text>
                 </View>
 
@@ -44,20 +45,20 @@ export default PostDetails
 
 const styles = StyleSheet.create({
     container: {
-      backgroundColor: "#FFFFFF",
+      backgroundColor: theme.colors.background,
       flex: 1,
       width:"100%",
       alignItems: 'center',
     },
     detailsWrapper:{
         width:"90%",
-        backgroundColor: "#FFFFFF",
     },
     postDetailsTitle:{
+        color: theme.colors.primary,
         paddingTop:10,
         fontSize:26,
         fontWeight: "bold",
-        borderBottomColor: '#dddddd',
+        borderBottomColor: theme.colors.secondary,
         borderBottomWidth: 1,
     },
     postDetailsSection:{
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
         width:"50%"
     },
     postDetailsLabel:{
+        color: theme.colors.primary,
         fontSize:16
     }
   });

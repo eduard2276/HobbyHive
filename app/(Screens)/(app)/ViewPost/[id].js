@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
-  Text,
-  SafeAreaView,
   StyleSheet,
   View,
   ScrollView,
-  Image,
   ActivityIndicator
 } from "react-native";
 import ProfileHeader from "../../../components/profile/ProfileHeader";
@@ -13,13 +10,15 @@ import PostDetails from "../../../components/profile/viewPost/PostDetails";
 import { applyUser, getUserPostAndDetails } from "../../../utils/firebaseUtils";
 import { useRouter, useSearchParams } from "expo-router";
 import Button from "../../../components/auth/Button";
+import { theme } from "../../../constants/theme";
+import { Stack } from "expo-router";
 
 const ScrollViewComp = ({ postDetails }) => {
   console.log('\n')
   console.log(postDetails)
   return (
     <ScrollView>
-      <ProfileHeader data={postDetails["userDetails"]} />
+      <ProfileHeader data={postDetails["userDetails"]} details={postDetails.postDetails}/>
       <PostDetails data={postDetails.postDetails} />
     </ScrollView>
   );
@@ -45,6 +44,15 @@ const Search = () => {
   return (
 
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: true,
+          headerBackVisible: true,
+          headerTitle: "",
+
+        }}
+      />
       {isLoading ? (
         <ActivityIndicator size="large" />
       ) : (
@@ -67,7 +75,7 @@ export default Search;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: theme.colors.background,
   },
   header: {
     backgroundColor: "#FFFFFF",

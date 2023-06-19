@@ -10,7 +10,8 @@ import {
 import { useRouter, useSearchParams } from "expo-router";
 import { getListOfMembersFromPostId, cancelPost } from "../../../utils/firebaseUtils";
 import { default as Menu } from "../../../components/common/Footer";
-import { format } from "date-fns";
+import { Stack } from "expo-router";
+import { theme } from "../../../constants/theme";
 
 const Messages = () => {
   const params = useSearchParams();
@@ -19,6 +20,14 @@ const Messages = () => {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: true,
+          headerBackVisible: true,
+          headerTitle: "",
+        }}
+      />
       {isLoading ? (
         <ActivityIndicator size="large" />
       ) : (
@@ -64,7 +73,7 @@ export default Messages;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   searchContainer: {
     backgroundColor: "#eee",
@@ -83,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: theme.colors.secondary,
   },
   image: {
     width: 48,
@@ -96,16 +105,18 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: theme.colors.primary
   },
   phoneText: {
     fontSize: 16,
     color: "#999",
   },
   button: {
-    backgroundColor: "#FFC107",
+    backgroundColor: theme.colors.secondary,
     borderRadius: 5,
     padding: 10,
-    marginRight: 10,
+    marginRight: 0,
+    marginLeft: 20,
   },
   buttonText: {
     color: "#fff",

@@ -28,8 +28,6 @@ export default function LoginScreen({ navigation }) {
     auth
       .signInWithEmailAndPassword(email.value, password.value)
       .then((userCredentials) => {
-        const user = userCredentials.user;
-        console.log("Logged in with:", user.email);
         router.push("/Search");
       })
       .catch((error) => alert(error.message));
@@ -37,6 +35,15 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <Background>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Login",
+
+        }}
+      />
       <Logo />
       <Header>Welcome back.</Header>
       <TextInput
@@ -50,6 +57,9 @@ export default function LoginScreen({ navigation }) {
         autoCompleteType="email"
         textContentType="emailAddress"
         keyboardType="email-address"
+        selectionColor="white"
+        outlineColor="white"
+        activeOutlineColor="yellow"
       />
       <TextInput
         label="Password"
@@ -59,6 +69,9 @@ export default function LoginScreen({ navigation }) {
         error={!!password.error}
         errorText={password.error}
         secureTextEntry
+        outlineColor="white"
+        activeOutlineColor="yellow"
+        selectionColor="white"
       />
       <Button mode="contained" onPress={onLoginPressed}>
         Login
@@ -93,6 +106,6 @@ const styles = StyleSheet.create({
   },
   link: {
     fontWeight: "bold",
-    color: theme.colors.primary,
+    color: theme.colors.secondary,
   },
 });

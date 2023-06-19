@@ -10,6 +10,8 @@ import Button from "../../components/auth/Button";
 import TextInput from "../../components/auth/TextInput";
 import { createNewPost } from "../../utils/firebaseUtils";
 import { useRouter } from "expo-router";
+import { theme } from "../../constants/theme";
+import { Stack } from "expo-router";
 
 const numOfPleopleSelection = [
   "1",
@@ -63,6 +65,15 @@ const Publish = () => {
   };
   return (
     <SafeAreaView style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Create Post",
+          headerTitleStyle: {color: theme.colors.primary}
+        }}
+      />
       <ScrollView>
         <View style={styles.selectSport}>
           <Text style={styles.sportTitle}>Select sport</Text>
@@ -75,7 +86,8 @@ const Publish = () => {
             arrowicon={<Icon name="chevron-down" size={20} color={"black"} />}
             searchicon={<Icon name="search" size={20} color={"black"} />}
             boxStyles={{ borderRadius: 20 }}
-            inputStyles={{ fontSize: 16 }}
+            inputStyles={{ fontSize: 16, color:theme.colors.text }}
+            dropdownTextStyles={{color: theme.colors.text}}
           />
         </View>
         <Selector
@@ -104,6 +116,9 @@ const Publish = () => {
             value={location}
             onChangeText={(text) => setLocation(text)}
             style={{ marginTop: 10 }}
+            outlineColor="black"
+            activeOutlineColor="black"
+            selectionColor="white"
           />
         </View>
         <View style={styles.categoryContainer}>
@@ -124,14 +139,14 @@ const Publish = () => {
           <View style={styles.timerContainer}>
             <View style={styles.timerButton}>
               <TimePicker text="Pick start time" setHour={setStartTime} />
-              <Text>
+              <Text style={{color:theme.colors.text}}>
                 Time Picked:{" "}
                 {`${startTime.getHours()}:${startTime.getMinutes()}`}
               </Text>
             </View>
             <View style={styles.timerButton}>
               <TimePicker text="Pick end time" setHour={setEndTime} />
-              <Text>
+              <Text style={{color:theme.colors.text}}>
                 Time Picked: {`${endTime.getHours()}:${endTime.getMinutes()}`}
               </Text>
             </View>
@@ -149,6 +164,9 @@ const Publish = () => {
             numberOfLines={4}
             multiline
             style={{ marginTop: 10 }}
+            outlineColor="black"
+            activeOutlineColor="black"
+            selectionColor="white"
           />
         </View>
         <View style={{ alignSelf: "center", width: "60%" }}>
@@ -169,12 +187,13 @@ export default Publish;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.background,
     flex: 1,
   },
   sportTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: theme.colors.primary
   },
   selectSport: {
     height: 160,
@@ -191,6 +210,7 @@ const styles = StyleSheet.create({
   titleLabel: {
     fontSize: 20,
     fontWeight: "bold",
+    color: theme.colors.primary
   },
   timerContainer: {
     flexDirection: "row",
@@ -204,5 +224,6 @@ const styles = StyleSheet.create({
   datePicked: {
     paddingTop: 5,
     fontSize: 16,
+    color: theme.colors.text
   },
 });

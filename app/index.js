@@ -6,15 +6,24 @@ import Logo from './components/auth/Logo'
 import Header from './components/auth/Header'
 import Button from './components/auth/Button'
 import Paragraph from './components/auth/Paragraph'
+import { theme } from './constants/theme';
+import { Text } from "react-native";
 
 export default function StartScreen() {
     const router = useRouter();
   return (
     <Background>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          headerTitle: "",
+        }}
+      />
       <Logo />
-      <Header>Login Template</Header>
+
       <Paragraph>
-        The easiest way to start with your amazing application.
       </Paragraph>
       <Button
         mode="contained"
@@ -26,7 +35,7 @@ export default function StartScreen() {
         mode="outlined"
         onPress={() => router.push("/SignUp")}
       >
-        Sign Up
+        <Text style={{color: theme.colors.outlineButtonColor}}>Sign Up</Text>
       </Button>
     </Background>
   )

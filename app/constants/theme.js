@@ -4,9 +4,13 @@ export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    text: "#000000",
-    primary: "#560CCE",
-    secondary: "#414757",
+    text: "#FFF",
+    primary: "#f8db5a",
+    secondary: "#9b875e",
     error: "#f13a59",
+    background: "#257391",
+    button: "#f8db5a",
+    outlineButtonColor: "#257391",
+    menuColor: "#354A54"
   },
 };

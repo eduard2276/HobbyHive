@@ -9,6 +9,8 @@ import { useRouter } from "expo-router";
 import { nameValidator as textValidator } from "../../utils/nameValidator";
 import { getImage, uploadImage } from "../../utils/firestoreUtils";
 import * as ImagePicker from 'expo-image-picker';
+import { Stack } from "expo-router";
+import { theme } from "../../constants/theme";
 
 const GenderTabs = ["Male", "Female", "Other"];
 let AgeTabs = [];
@@ -33,14 +35,11 @@ const EditProfile = () => {
   const { data } = getUserInfo(auth.currentUser?.uid);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.canceled) {
       setNewImage(result.assets[0].uri);
@@ -101,8 +100,7 @@ const EditProfile = () => {
       hobbies: hobbies.value,
       isProfileReady: true,
     }).then(() => {
-      console.log("Done");
-      router.push("/Search");
+      router.replace("/Search");
     });
     if(newImage)
     {
@@ -111,7 +109,16 @@ const EditProfile = () => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: theme.colors.background}}>
+      <Stack.Screen
+        options={{
+          headerStyle: { backgroundColor: theme.colors.background },
+          headerShadowVisible: false,
+          headerBackVisible: true,
+          headerTitle: "Edit profile",
+          headerTitleStyle: {color: theme.colors.primary}
+        }}
+      />
       <View style={styles.container}>
         <View style={styles.avatarContainer}>
           <Image
@@ -121,7 +128,7 @@ const EditProfile = () => {
             }}
           />
           <TouchableOpacity onPress={pickImage}>
-            <Text> Edit photo </Text>
+            <Text style={{color: theme.colors.primary}}> Edit photo </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.form}>
@@ -132,6 +139,9 @@ const EditProfile = () => {
             onChangeText={(text) => setFullName({ value: text, error: "" })}
             error={!!fullName.error}
             errorText={fullName.error}
+            selectionColor="white"
+            outlineColor="white"
+            activeOutlineColor="yellow"
           />
           <TextInput
             label="Location"
@@ -165,6 +175,7 @@ const EditProfile = () => {
           <Text style={styles.label}>Age </Text>
           <Tabs tabs={AgeTabs} activeTab={age} setActiveTab={setAge} />
 
+          <View style={{marginTop: 10}}>
           <TextInput
             label="About"
             returnKeyType="next"
@@ -174,9 +185,9 @@ const EditProfile = () => {
             errorText={about.error}
             numberOfLines={4}
             multiline
-            style={{ marginTop: 10 }}
           />
-
+          </View>
+          <View style={{marginTop: 10}}>
           <TextInput
             label="Hobbies"
             returnKeyType="next"
@@ -184,8 +195,8 @@ const EditProfile = () => {
             onChangeText={(text) => setHobbies({ value: text, error: "" })}
             error={!!hobbies.error}
             errorText={hobbies.error}
-            style={{ marginTop: 10 }}
           />
+          </View>
         </View>
         <Button
           mode="contained"
@@ -208,7 +219,6 @@ const styles = StyleSheet.create({
     maxWidth: 340,
     alignSelf: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   keyboardAvoidingView: {
     flex: 0,

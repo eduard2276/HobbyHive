@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
+import { theme } from "../../constants/theme";
 
 function TabButton({ name, activeTab, onHandleSearchType }) {
   return (
@@ -45,11 +46,12 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 12,
     marginBottom: 12 / 2,
+    backgroundColor: theme.colors.background
   },
   btn: (name, activeTab) => ({
     paddingVertical: 16,
     paddingHorizontal: 24,
-    backgroundColor: name === activeTab ? "#312651" : "#F3F4F8",
+    backgroundColor: name === activeTab ? theme.colors.primary : theme.colors.menuColor,
     borderRadius: 16,
     marginLeft: 2,
     shadowColor: "#000",
@@ -64,6 +66,7 @@ const styles = StyleSheet.create({
   }),
   btnText: (name, activeTab) => ({
     fontSize: 12,
-    color: name === activeTab ? "#C3BFCC" : "#AAA9B8",
+    fontWeight:'bold',
+    color: name === activeTab ? theme.colors.background : "#AAA9B8",
   }),
 });
